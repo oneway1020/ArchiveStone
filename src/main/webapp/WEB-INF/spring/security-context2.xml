@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/security 
+    http://www.springframework.org/schema/security/spring-security.xsd">
+    
+    <!-- DB에 저장된 ID를 통해 인증하는 방법 -->
+    <beans:bean id ="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+    
+    <http pattern="/" security="none"></http>
+    <http pattern="/resources/**" security="none"></http>
+    <http auto-config="true">
+    <intercept-url pattern="/board/**" access="isAuthenticated()"/>
+    <form-login
+        login-page="/login"
+        login-processing-url="/login"
+        username-parameter="email"
+        password-parameter="password" />
+        
+    <logout
+        logout-url="/logout"
+        logout-success-url="/"
+        delete-cookies="JSESSIONID" />
+    </http>
+    
+    <authentication-manager>
+        <authentication-provider>
+            <jdbc-user-service 
+                data-source-ref="dataSource" 
+                users-by-username-query="select email, password, 1 enabled from member where email=?"
+                authorities-by-username-query="select m.email, g.group_name from member m join member_group g on m.group_id = g.group_id where m.email=?" />
+            <password-encoder ref="bcryptPasswordEncoder"/>
+        </authentication-provider>
+    </authentication-manager>
+
+</beans:beans>
