@@ -16,11 +16,20 @@ public class BoardDAO {
 	private	static String namespace = "BoardDAO";
 
 	//-----------------------------------------------------------------------------------------------------------
-	// 게시글 목록 가져오기
+	// 게시판 목록 가져오기
 	//-----------------------------------------------------------------------------------------------------------	
 	public List<BoardDTO> boardList() {
 		List<BoardDTO> boardList = sqlSession.selectList(namespace + ".listAll");
 		return boardList;
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// 게시판 검색 목록 가져오기
+	//-----------------------------------------------------------------------------------------------------------		
+	public List<BoardDTO> searchGall(String searchGall) {
+		
+		List<BoardDTO> boardConfigList = sqlSession.selectList(namespace + ".searchGall", searchGall);
+		return boardConfigList;
 	}
 
 }

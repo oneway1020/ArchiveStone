@@ -114,10 +114,12 @@
 		</div>
 		<div id="search">
 			<!-- 해당 내용으로 검색 -->
-			<input id="searchGall" size="35" maxlength="35" onkeypress="fnEnterkey();"/>
-			<a class="tool_a" onclick="searchgall();">
-				<i id="searchIcon" class="bi bi-search fs-5"></i>
-			</a>
+			<form id="searchForm">
+				<input id="searchGall" name="searchGall" size="35" maxlength="35" onkeypress="fnEnterkey();"/>
+				<a class="tool_a" onclick="searchgall();">
+					<i id="searchIcon" class="bi bi-search fs-5"></i>
+				</a>
+			</form>
 		</div>
 	</div>
 	<nav style="padding: 10px 0; border: 3px solid rgba(220, 220, 220, 1); border-left: none; border-right: none">

@@ -13,5 +13,23 @@
 			where m_id = #{m_id}
 		]]>
 	</select>
-
+	
+	<!-- 아이디 중복 검사 결과 처리 -->
+	<select id="idCheck" parameterType="user" resultType="int">
+		<![CDATA[
+			SELECT	COUNT(*) 
+			FROM	member 
+			WHERE	m_id = #{m_id}
+		]]>
+	</select>
+	
+	<!-- 회원가입 처리 -->
+	<insert id="signUp" parameterType="user">
+		<![CDATA[
+			INSERT INTO member (m_id, m_name, m_pass, m_level, j_ip) 
+			VALUES (#{m_id}, #{m_name}, #{m_pass}, 2, #{j_ip})
+		]]>
+	</insert>
+	
+	
 </mapper>

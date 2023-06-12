@@ -7,5 +7,6 @@
 	<!-- Alias 설정 -->
 	<typeAliases>
 		<typeAlias alias="user" type="com.main.archive.user.dto.UserDTO"/>
+		<typeAlias alias="board" type="com.main.archive.board.dto.BoardDTO"/>
 	</typeAliases>
 </configuration>

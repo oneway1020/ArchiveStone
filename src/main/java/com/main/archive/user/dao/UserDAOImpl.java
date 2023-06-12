@@ -21,4 +21,20 @@ public class UserDAOImpl implements UserDAO {
 		return sqlSession.selectOne(NAMESPACE + ".getUser", userDTO);
 	}
 
+	// 아이디 중복검사
+	@Override
+	public int idCheck(UserDTO userDTO) throws Exception {
+		
+		
+		return sqlSession.selectOne(NAMESPACE + ".idCheck", userDTO);
+	}
+
+	// 회원가입
+	@Override
+	public int signUp(UserDTO userDTO) throws Exception {
+		
+		int result = sqlSession.insert(NAMESPACE + ".signUp", userDTO);
+		return result;
+	}
+
 }

@@ -27,4 +27,19 @@ public class UserServiceImpl implements UserService {
 		return null;
 	}
 
+	// 아이디 중복검사
+	@Override
+	public int idCheck(UserDTO userDTO) throws Exception {
+		int result = userDAO.idCheck(userDTO);
+		return result;
+	}
+
+	// 회원가입
+	@Override
+	public int signUp(UserDTO userDTO) throws Exception {
+		
+		int result = userDAO.signUp(userDTO);
+		return result;
+	}
+
 }

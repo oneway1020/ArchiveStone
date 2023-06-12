@@ -15,6 +15,9 @@
 		border-width: 2px;
 		border-color: #808080;
 	}
+	#loginBox a:hover {
+		color: #808080;
+	}
 	
 	#id {
 		width: 145px; height: 37px; margin: 10px 10px; 
@@ -93,6 +96,7 @@
 							<input id="pass" name="m_pass" placeholder=" 비밀번호"/>
 							<button id="loginBtn"class="btn btn-primary" onclick="login();">로그인</button>
 						</div>
+						<a style="float:right; cursor:pointer; margin-top:5px;"onclick="location.href='/accounts/signUpForm';"><b>회원가입</b></a>
 					</div>
 				</form>
 			</c:otherwise>
@@ -104,27 +108,9 @@
 	<P>  Your IP address = ${ip}</P>
 	</main>
 	
-	<jsp:include page="./common/footer.jsp"/>
+	<jsp:include page="./common/footer.jsp" flush="false"/>
 </body>
+<script src="/resources/js/loginLogout.js"></script>
 
-<script>
-	function login() {
-		let loginForm = document.getElementById("loginForm");
-		loginForm.setAttribute("charset", "UTF-8");
-		loginForm.setAttribute("method", "post");
-		loginForm.setAttribute("action", "/accounts/login");
-		
-		
-		loginForm.submit();
-	}
-	
-	function logout() {
-		let logoutForm = document.getElementById("logoutForm");
-		logoutForm.setAttribute("charset", "UTF-8");
-		logoutForm.setAttribute("method", "post");
-		logoutForm.setAttribute("action", "/accounts/logout");
-		
-		logoutForm.submit();
-	}
-</script>
+
 </html>

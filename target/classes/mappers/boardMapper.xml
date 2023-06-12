@@ -5,12 +5,24 @@
 
 
 <mapper namespace="BoardDAO">
-	<!-- 모든 게시판 이름 가져오기 -->
-	<select id="listAll" resultType="com.main.archive.board.dto.BoardDTO">
+	<!-- 게시판 전체 목록 가져오기 -->
+	<select id="listAll" resultType="board">
 		<![CDATA[
-		SELECT	bc_name
-		FROM	bd_board_config
-		ORDER BY b_num DESC
+			SELECT	bc_code, bc_name 
+			FROM	bd_board_config 
+			WHERE	1=1 
+			ORDER BY	bc_name ASC 
+		]]>
+	</select>
+
+
+	<!-- 검색 게시판 이름 가져오기 -->
+	<select id="searchGall" resultType="board">
+		<![CDATA[
+		SELECT	bc_code, bc_name 
+		FROM	bd_board_config 
+		WHERE 1=1 AND bc_name LIKE CONCAT('%', #{searchGall}, '%') 
+		ORDER BY bc_name ASC
 		]]>
 	</select>
 	
