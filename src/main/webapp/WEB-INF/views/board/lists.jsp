@@ -50,12 +50,11 @@
 	</c:choose>
 	</main>
 	
-	<jsp:include page="../common/footer.jsp"/>
+	<jsp:include page="../common/footer.jsp" flush="false"/>
 </body>
 
 <script>
 	function goBoard(code) {
-		alert(code);
 		location.href="/board/record?bc_code="+code;
 	}
 </script>

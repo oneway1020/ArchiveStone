@@ -8,5 +8,7 @@
 	<typeAliases>
 		<typeAlias alias="user" type="com.main.archive.user.dto.UserDTO"/>
 		<typeAlias alias="board" type="com.main.archive.board.dto.BoardDTO"/>
+		<typeAlias alias="comment" type="com.main.archive.comment.dto.CommentDTO"/>
+		<typeAlias alias="searchCriteria" type="com.main.archive.common.util.search.SearchCriteria"/>
 	</typeAliases>
 </configuration>

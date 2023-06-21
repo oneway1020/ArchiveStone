@@ -129,26 +129,17 @@
 					<li>
 						<a href="/board/lists">게시판</a>
 					</li>
-					<li class="drop">
-						<a href="/product/남성">남성</a>
-						<ul class="drop-menu">
-							<li>
-								<a class="dropdown-item" href="/product/남성?detail=outer">아우터</a>
-							</li>
-							<li>
-								<a class="dropdown-item" href="/product/남성?detail=top">상의</a>
-							</li>
-							<li>
-								<a class="dropdown-item" href="/product/남성?detail=bottom">바지</a>
-							</li>		
-						</ul>
-					</li>
 					<li>
-						<a href="/product/myInfo">내정보</a>
+						<a href="/accounts/myInfo">내정보</a>
 					</li>
 					<li>
 						<a href="/board/Q&A">Q&A</a>
 					</li>
+					<c:if test="${user.m_level == 0}">
+						<li>
+							<a href="/admin/home">관리자 페이지</a>
+						</li>
+					</c:if>
 				</ul>
 			</div>
 		</div>

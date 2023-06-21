@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+
+<mapper namespace="CommentDAO">
+	<!-- 댓글 불러오기 -->
+	<select id="commentLoad" resultType="comment">
+		<![CDATA[
+			SELECT	* 
+			FROM	bd_comment 
+			WHERE bc_code = #{bc_code} AND b_num = #{b_num} 
+			ORDER BY co_idx;
+		]]>
+		
+	</select>
+	
+	<!-- 댓글 등록하기 -->
+	<insert id="commentRegister" parameterType="comment">
+		<![CDATA[
+			INSERT INTO 
+			bd_comment	(bc_code, b_num, m_id, m_name, m_pass, co_content, m_ip)
+			VALUES		(#{bc_code}, #{b_num}, #{m_id}, #{m_name}, #{m_pass}, #{co_content}, #{m_ip})
+		]]>
+	</insert>
+
+</mapper>

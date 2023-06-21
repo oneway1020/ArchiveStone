@@ -16,6 +16,7 @@
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<mvc:resources mapping="/resources/**" location="/resources/" />
+	
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -24,5 +25,52 @@
 	</bean>
 	
 	<context:component-scan base-package="com.main.archive" />
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 최대 업로드 가능한 바이트 크기(바이트 단위), -1은 제한이 없음을 의미 -->
+		<property name="maxUploadSize" value="10485760" />
+		<!-- 최대 메모리 설정 바이트 사이즈 -->
+		<property name="maxInMemorySize" value="10485760" />
+		<!-- 업로드 요청을 변환할 때 사용할 문자 인코딩 방식 -->
+		<property name="defaultEncoding" value="utf-8" />
+	</bean>
+	
+	<!-- 파일 업로드를 위한 경로 설정 -->
+	<!-- 파일을 실제로 저장할 위치를 물리적으로 지정 -->
+	<!-- String uploadPath = new String("c:/upload"); -->
+	<!-- 
+	<bean id="uploadPath" class="java.lang.String">
+		<constructor-arg value="c:/sts-3.9.18.RELEASE/sProject/archiveWebFile"/>
+	</bean>
+	 -->
+	
+	
+	
+	
+	<!-- 인터셉터 객체 생성 -->
+	<!-- LoginInterceptor LoginInterceptor = new LoginInterceptor(); -->
+	<!-- 로그인 유저만 -->
+	<bean id="LoginInterceptor" class="com.main.archive.common.interceptor.LoginInterceptor"></bean>
+	<!-- 관리자만 -->
+	<bean id="AdminInterceptor" class="com.main.archive.common.interceptor.AdminInterceptor"></bean>
+	
+	
+	<!-- 인터셉터 설정 -->
+	<!-- 로그인 -->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<!-- <mapping path="/**"/> 모든 url에 적용하고 싶을 때 /**를 사용 -->
+			<mvc:mapping path="/accounts/myInfo/**"/>
+			<ref bean="LoginInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+	<!-- 관리자 -->	
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<!-- <mapping path="/**"/> 모든 url에 적용하고 싶을 때 /**를 사용 -->
+			<mvc:mapping path="/admin/**"/>
+			<ref bean="AdminInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>	
 	
 </beans>

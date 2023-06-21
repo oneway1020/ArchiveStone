@@ -21,6 +21,7 @@ public class BoardDTO {
 	private String title;		// 글 제목
 	private String content;		// 글 내용
 	private int b_cnt;			// 조회수
+	private int b_good;			// 추천수
 	private Timestamp writetime;// 작성시간
 	
 	
@@ -30,6 +31,13 @@ public class BoardDTO {
 	// bd_board_config 정보
 	private String bc_name;		// 게시판 이름
 	
+	// bd_good_bad 정보
+	private int	good;
+	private int bad;
 	
+	private int goodCount;		// selectKey로 good개수 가져오기
+	private int badCount;		// selectKey로 bad개수 가져오기
+	
+	private int maxNumber;		// selectKey로 최대 b_num값 넣기
 
 }

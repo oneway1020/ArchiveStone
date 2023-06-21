@@ -5,6 +5,23 @@
 
 
 <mapper namespace="BoardDAO">
+	<!-- 아이피 정보 가져오기 -->
+	<select id="ipCheck" resultType="board">
+		<![CDATA[
+			SELECT	m_ip 
+			FROM	c_good_bad_info 
+			WHERE	gb_idx = (
+			SELECT	gb_idx 
+			FROM	(
+				SELECT gb_idx
+				FROM	bd_good_bad
+				WHERE bc_code= #{bc_code} AND b_num= #{b_num}
+			) as sub
+		)
+		]]>
+		<include refid = "checkIpSQL"/>
+	</select>
+
 	<!-- 게시판 전체 목록 가져오기 -->
 	<select id="listAll" resultType="board">
 		<![CDATA[
@@ -26,4 +43,234 @@
 		]]>
 	</select>
 	
+	<!-- bc_code에 해당하는 게시판 게시글 가져오기 -->
+	<select id="recordList" resultType="board">
+		<![CDATA[
+			SELECT b_idx, bc_code, b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good
+			FROM (	SELECT b_idx, bd_board.bc_code, b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good, ROW_NUMBER() OVER(ORDER BY b_idx DESC) as rNUM
+					FROM bd_board
+					WHERE bc_code = #{bc_code} 
+			]]>
+			<include refid = "searchMySQL"/>
+			<![CDATA[
+				) brd
+				WHERE brd.rNUM BETWEEN #{perPageNum}*(#{page}-1) + 1 AND #{perPageNum}*(#{page}-1)+#{perPageNum}
+			]]>
+			<include refid = "recommendSQL"/>
+			<![CDATA[
+				ORDER BY b_idx DESC 
+		]]>
+	</select>
+	
+	
+	<!-- 게시글 등록하기 -->
+	<insert id="boardRegister" parameterType="board">
+		<![CDATA[
+			INSERT INTO bd_board (bc_code, b_num, m_id, m_name, m_pass, m_ip, title, content, writetime)
+			VALUES (#{bc_code}, (SELECT IFNULL(max(b_num), 0) + 1 FROM bd_board as t WHERE bc_code=#{bc_code}), #{m_id}, #{m_name}, #{m_pass}, #{m_ip}, #{title}, #{content}, NOW())
+		]]>
+		<selectKey keyProperty="maxNumber" resultType="Int" order="AFTER">
+			<![CDATA[
+				SELECT MAX(b_num) FROM bd_board WHERE bc_code = #{bc_code}
+			]]>
+		</selectKey>
+	</insert>
+	
+	<!-- 추천비추 레코드 생성 -->
+	<insert id="createGbRecord" parameterType="board">
+		<![CDATA[
+			INSERT INTO bd_good_bad (bc_code, b_num)
+			VALUES (#{bc_code}, #{maxNumber}) 
+		]]>
+	</insert>
+	
+	<!-- 추천누름 -->
+	<insert id="insertGood" parameterType="board">
+		<![CDATA[
+			INSERT INTO c_good_bad_info (gb_idx, m_ip, good)
+			VALUES ((SELECT gb_idx FROM bd_good_bad WHERE bc_code= #{bc_code} AND b_num= #{b_num}), #{m_ip}, #{good})
+		]]>
+		<selectKey keyProperty="goodCount" resultType="Int" order="AFTER">
+			<![CDATA[
+				SELECT COUNT(good) 
+				FROM c_good_bad_info 
+				WHERE	gb_idx = (
+					SELECT	gb_idx 
+					FROM	(
+						SELECT gb_idx
+						FROM	bd_good_bad
+						WHERE bc_code= #{bc_code} AND b_num= #{b_num}
+					) as sub
+				)
+				AND good = 1;
+			]]>
+		</selectKey> 
+	</insert>
+	<!-- bd_good_bad의 good값 update -->
+	<update id="updateGoodCount" parameterType="board">
+		<![CDATA[
+			UPDATE	bd_good_bad a, bd_board b
+			SET		a.good = #{goodCount}, b.b_good = #{goodCount}
+			WHERE	a.gb_idx = (
+						SELECT	gb_idx 
+						FROM	(
+							SELECT gb_idx
+							FROM	bd_good_bad
+							WHERE bc_code= #{bc_code} AND b_num= #{b_num}
+						) as sub
+					) AND b.bc_code = #{bc_code} AND b.b_num = #{b_num}
+		]]>
+	</update>
+	
+	<!-- 비추누름 -->
+	<insert id="insertBad" parameterType="board">
+		<![CDATA[
+			INSERT INTO c_good_bad_info (gb_idx, m_ip, bad)
+			VALUES ((SELECT gb_idx FROM bd_good_bad WHERE bc_code= #{bc_code} AND b_num= #{b_num}), #{m_ip}, #{bad})
+		]]>
+		<selectKey keyProperty="badCount" resultType="Int" order="AFTER">
+			<![CDATA[
+				SELECT COUNT(bad) 
+				FROM c_good_bad_info 
+				WHERE	gb_idx = (
+					SELECT	gb_idx 
+					FROM	(
+						SELECT gb_idx
+						FROM	bd_good_bad
+						WHERE bc_code= #{bc_code} AND b_num= #{b_num}
+					) as sub
+				)
+				AND bad = 1;
+			]]>
+		</selectKey> 
+	</insert>
+	<!-- bd_good_bad의 bad값 update -->
+	<update id="updateBadCount" parameterType="board">
+		<![CDATA[
+			UPDATE	bd_good_bad 
+			SET		bad = #{badCount} 
+			WHERE	gb_idx = (
+						SELECT	gb_idx 
+						FROM	(
+							SELECT gb_idx
+							FROM	bd_good_bad
+							WHERE bc_code= #{bc_code} AND b_num= #{b_num}
+						) as sub
+					)
+		]]>		
+	</update>
+	
+	<!-- 게시판 게시글 수 구하기 -->
+	<select id="totalBoardRecordCount" parameterType="searchCriteria" resultType="Integer">
+		<![CDATA[
+			SELECT COUNT(*)
+			FROM bd_board
+			WHERE 1 = 1 AND bc_code = #{bc_code}
+		]]>
+	</select>
+	
+	
+	<!-- 게시글 조회수 올리기 -->
+	<update id="updateReadCount" parameterType="searchCriteria">
+		<![CDATA[
+			UPDATE	bd_board 
+			SET		b_cnt = b_cnt + 1
+			WHERE	bc_code = #{bc_code} AND b_num = #{b_num} 
+		]]>
+	</update>
+	
+	<!-- 게시글 정보 조회 -->
+	<select id="recordDetail" resultType="board">
+		<![CDATA[
+			SELECT	b_idx, bd_board.bc_code, bd_board.b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good, gb_idx, good, bad
+			FROM	bd_board JOIN bd_good_bad
+			WHERE	bd_board.bc_code = #{bc_code}	AND bd_good_bad.bc_code = #{bc_code} 
+			AND 	bd_board.b_num = #{b_num}		AND bd_good_bad.b_num = #{b_num}
+		]]>
+	</select>
+	
+	<!-- 게시글 수정(업데이트) -->
+	<update id="recordUpdate" parameterType="board">
+		<![CDATA[
+			UPDATE	bd_board
+			SET		title = #{title}, m_name = #{m_name}, content = #{content}
+			WHERE	bc_code = #{bc_code} AND b_num = #{b_num} 
+		]]>
+	</update>
+	
+	<!-- 비로그인 게시글 수정 비밀번호 확인 -->
+	<select id="checkModifyPass" resultType="board">
+		<![CDATA[
+			SELECT *
+			FROM bd_board 
+			WHERE bc_code = #{bc_code} AND b_num = #{b_num} AND m_pass = #{m_pass}
+		]]>
+	</select>
+	
+	<!-- 비로그인 게시글 삭제 비밀번호 확인 -->
+	<select id="checkDeletePass" resultType="board">
+		<![CDATA[
+			SELECT *
+			FROM bd_board
+			WHERE bc_code = #{bc_code} AND b_num = #{b_num} AND m_pass = #{m_pass}
+		]]>
+	</select>
+	
+	<!-- 게시글 삭제 -->
+	<delete id="recordDelete" parameterType="board">
+		<![CDATA[
+			DELETE FROM a, b
+			USING		bd_board	AS a 
+			LEFT JOIN	bd_good_bad	AS b 
+			ON	a.bc_code	=	b.bc_code 
+			WHERE	b.bc_code = #{bc_code} AND b.b_num = #{b_num}
+			AND		a.bc_code = #{bc_code} AND a.b_num = #{b_num}
+		]]>
+	</delete>
+	<!-- 추천 비추 유저정보 삭제 -->
+	<delete id="boardGoodBadInfoDelete">
+		<![CDATA[
+			DELETE FROM c_good_bad_info WHERE gb_idx IN
+			(SELECT * FROM
+			(SELECT A.gb_idx
+			FROM c_good_bad_info A
+			LEFT OUTER JOIN	bd_good_bad B
+			ON A.gb_idx = B.gb_idx 
+			WHERE B.gb_idx IS NULL) AS temp_table);
+		]]>
+	</delete>
+	
+	<!-- 검색에 대한 부분을 위한 sql문 -->
+	<sql id="searchMySQL">
+		<if test="searchType != null">
+			<if test="searchType == 't'.toString()">
+				AND title LIKE CONCAT('%', #{keyword}, '%') 
+			</if>
+			<if test="searchType == 'c'.toString()">
+				AND content LIKE CONCAT('%', #{keyword}, '%') 
+			</if>
+			<if test="searchType == 'tc'.toString()">
+				AND	title LIKE CONCAT('%', #{keyword}, '%')
+				OR	content LIKE CONCAT('%', #{keyword}, '%') 
+			</if>
+			<if test="searchType == 'u'.toString()">
+				AND m_name LIKE CONCAT('%', #{keyword}, '%') 
+			</if>
+		</if>
+	</sql>
+	<!-- 추천글인지 확인을 위한 sql문 -->
+	<sql id="recommendSQL">
+		<if test="recommend != null">
+			AND b_good >= 10
+		</if>
+	</sql>
+	
+	<sql id="checkIpSQL">
+		<if test="good == 1">
+			AND	good = 1
+		</if>
+		<if test="bad == 1">
+			AND	bad = 1
+		</if>
+	</sql>
 </mapper>

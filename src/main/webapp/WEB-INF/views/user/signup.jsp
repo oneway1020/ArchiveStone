@@ -130,6 +130,7 @@
 					</span>
 					<input type="password" class="form-control" id="passwordRe" name="passwordRe" oninput="checkPass();" placeholder="비밀번호 재확인"/>
 				</div>
+				<input type="hidden" id="checked_pass" value=""/>
 				<div class="input-group">
 					<span class="input-group-text">
 						<i class="bi bi-person-circle fs-5"></i>

@@ -11,6 +11,12 @@ function checkID() {
     $("#id").focus();
     return false;
   }
+  
+  if ($("#id").val().length > 20) {
+  	alert("아이디는 20자리 이하로 해주세요");
+  	$("#id").focus();
+    return false;
+  }
 
   // 입력한 아이디가 DB에 존재하는지 확인
   $.ajax({
@@ -42,16 +48,34 @@ function signUp() {
 	let pass = $("#password").val();
 	let name = $("#name").val();
 	
+	if($("#checked_id").val() != "y") {
+		alert("아이디 중복체크를 해주세요");
+		return false;
+	}
+	
+	if(name.length < 2) {
+		alert("닉네임은 2자리 이상으로 해주세요");
+		$("#name").focus();
+		return false;
+	}
+	
+	if(name.length > 20) {
+		alert("닉네임은 20자리 이하로 해주세요");
+		$("#name").focus();
+		return false;
+	}
+	
 	if(pass.length < 4) {
 		alert("비밀번호는 4자리 이상으로 해주세요");
 		$("#password").focus();
 		return false;
 	}
 	
-	if($("#checked_id").val() != "y") {
-		alert("아이디 중복체크를 해주세요");
+	if($("#checked_pass").val() != "y") {
+		alert("비밀번호 재확인을 해주세요");
 		return false;
 	}
+	
 
 	$.ajax({
 		url: "/accounts/signUp",
@@ -86,8 +110,10 @@ function checkPass() {
 	if(realPass != checkPass) {
 		$("#passCheck").css({'color':'red','opacity':'0.5'});
 		$("#passCheck").text("비밀번호를 일치시켜주세요");
+		$("#checked_pass").val("");
 	} else {
 		$("#passCheck").css('color','green')
 		$("#passCheck").text("비밀번호가 일치합니다");
-	}	
+		$("#checked_pass").val("y");
+	}
 }

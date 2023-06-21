@@ -139,5 +139,15 @@ public class UserController {
 		return "redirect:/";
 	}
 	
+	//-----------------------------------------------------------------------------------------------------------
+	// 내정보
+	//-----------------------------------------------------------------------------------------------------------	
+	@RequestMapping(value="/myInfo", method=RequestMethod.GET)
+	public String myInfo() {
+		
+		// 가져와야할 것. 내 정보 (member테이블), 내가 쓴 글 (bd_board), 내가쓴 댓글
+		
+		return "/user/myInfo";
+	}
 	
 }

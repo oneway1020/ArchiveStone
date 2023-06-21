@@ -5,11 +5,15 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
 		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	
@@ -40,4 +44,33 @@
 		<constructor-arg name="sqlSessionFactory" ref="SqlSessionFactory"></constructor-arg>
 	</bean>
 	
+	<!-- 트랜잭션 관리 객체 -->
+	<!-- 이 빈의 id는 트랙잭션 AOP transaction-manager에서 사용된다. -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 트랜잭션 AOP 설정 -->
+	<!-- 이 advice의 id는 aop:conf advisor에서 사용된다.(실제 동작할 Advice) -->
+	<!-- tx:method = 적용대상 method. 예외 발생 시 롤백한다. -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="insert*" rollback-for="Exception" />
+			<tx:method name="update*" rollback-for="Exception" />
+			<tx:method name="delete*" rollback-for="Exception" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut id="transactionPointcut" 
+				expression="within(hs.spring.hsweb..*)" />
+		
+		<aop:advisor id="transactionAdvisor" 
+				pointcut-ref="transactionPointcut" advice-ref="txAdvice" />
+	</aop:config>
+	
+	<!-- 스케줄러를 위한 태그 -->
+	<task:annotation-driven/>
+	<context:component-scan base-package="com.main.archive"></context:component-scan>
 </beans>

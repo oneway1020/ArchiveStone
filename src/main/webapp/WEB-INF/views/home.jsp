@@ -93,7 +93,7 @@
 					<div id="loginBox">
 						<input id="id" name="m_id" placeholder=" 아이디"/>
 						<div>
-							<input id="pass" name="m_pass" placeholder=" 비밀번호"/>
+							<input type="password" id="pass" name="m_pass" placeholder=" 비밀번호"/>
 							<button id="loginBtn"class="btn btn-primary" onclick="login();">로그인</button>
 						</div>
 						<a style="float:right; cursor:pointer; margin-top:5px;"onclick="location.href='/accounts/signUpForm';"><b>회원가입</b></a>
