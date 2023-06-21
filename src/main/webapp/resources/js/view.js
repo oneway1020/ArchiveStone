@@ -84,8 +84,8 @@ function commentLoad() {
       b_num: b_num,
     },
     success: function (data) {
-      var commentHTML = "";
-      var commentCnt = 0;
+      // var commentHTML = "";
+
       // alert(data); //[object Object],[object Object] ...
       // if (data.length > 0) {
       // commentHTML += "<div style='margin-bottom:10px;'></div>";
@@ -103,7 +103,6 @@ function commentLoad() {
       //   commentHTML += "<h6><strong>등록된 댓글이 없습니다.</strong></h6>";
       //   commentHTML += "</div>";
       // }
-      $("#commentCount").html(commentCnt);
       $("#commentList").html(data);
     },
     error: function (e) {
@@ -120,17 +119,17 @@ function commentRegister() {
   var m_name = $("#commentNameInput").val();
   var m_pass = $("#commentPass").val();
   var co_content = $("#commentContent").val();
-	
-	if(m_name.length < 2) {
-		alert("닉네임은 2자리 이상으로 해주세요");
-		return false;
-	}
-	
-	if(m_name.length > 20) {
-		alert("닉네임은 20자리 이하로 해주세요");
-		return false;
-	}
-	
+
+  if (m_name.length < 2) {
+    alert("닉네임은 2자리 이상으로 해주세요");
+    return false;
+  }
+
+  if (m_name.length > 20) {
+    alert("닉네임은 20자리 이하로 해주세요");
+    return false;
+  }
+
   $.ajax({
     type: "post",
     url: "/comment/commentRegister",

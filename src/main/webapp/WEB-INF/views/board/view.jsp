@@ -154,8 +154,8 @@
 				</div>
 			</div>
 		</div>
+
 		<div id="commentList">
-		
 		</div>
 		
 		<div id="commentInput">

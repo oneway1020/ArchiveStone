@@ -35,10 +35,10 @@ public class CommentController {
 		List<CommentDTO> commentList = commentService.commentLoad(commentDTO);
 		
 		System.out.println("댓글 불러오기 결과물: " + commentList);
-		
+		int listSize = commentList.size();
 		model.addAttribute("commentList", commentList);
 		model.addAttribute("user", user);
-		
+		model.addAttribute("liseSize", listSize);
 		return "/common/ajaxComment";
 	}
 	
