@@ -130,7 +130,7 @@
 						<a href="/board/lists">게시판</a>
 					</li>
 					<li>
-						<a href="/accounts/myInfo">내정보</a>
+						<a href="/accounts/myInfo/${user.m_id}">내정보</a>
 					</li>
 					<li>
 						<a href="/board/Q&A">Q&A</a>

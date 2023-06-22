@@ -34,7 +34,7 @@ public class CommentController {
 		
 		List<CommentDTO> commentList = commentService.commentLoad(commentDTO);
 		
-		System.out.println("댓글 불러오기 결과물: " + commentList);
+//		System.out.println("댓글 불러오기 결과물: " + commentList);
 		int listSize = commentList.size();
 		model.addAttribute("commentList", commentList);
 		model.addAttribute("user", user);
@@ -55,5 +55,24 @@ public class CommentController {
 			commentDTO.setM_pass(user.getM_pass());			
 		}
 		return commentService.commentRegister(commentDTO);
+	}
+	
+	//-----------------------------------------------------------------------------------------------------------
+	// 댓글 삭제하기
+	//-----------------------------------------------------------------------------------------------------------		
+	@ResponseBody
+	@RequestMapping(value="/commentDelete", method=RequestMethod.POST)
+	public int commentDelete(CommentDTO commentDTO) {
+		return commentService.commentDelete(commentDTO);
+	}
+	
+	//-----------------------------------------------------------------------------------------------------------
+	// 댓글 비밀번호 확인
+	//-----------------------------------------------------------------------------------------------------------		
+	@ResponseBody
+	@RequestMapping(value="/commentPassCheck", method=RequestMethod.POST)
+	public int commentPassCheck(CommentDTO commentDTO) {
+//		System.out.println("commentDTO 내용물: " + commentDTO);
+		return commentService.commentPassCheck(commentDTO);
 	}
 }

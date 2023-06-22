@@ -17,6 +17,12 @@ function checkID() {
   	$("#id").focus();
     return false;
   }
+  
+  if ($("#id").val() == "Anonymous") {
+  	alert("사용 불가능한 아이디입니다. 다시 입력해주세요");
+  	$("#id").focus();
+  	return false;
+  }
 
   // 입력한 아이디가 DB에 존재하는지 확인
   $.ajax({

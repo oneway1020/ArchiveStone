@@ -9,15 +9,16 @@ import lombok.Data;
 @Component("commentDTO")
 @Data
 public class CommentDTO {
-	private	int		co_idx;
-	private String	bc_code;
-	private int		b_num;
-	private String	m_id;
-	private String	m_name;
-	private String	m_pass;
-	private String	co_content;
+	private	int			co_idx;
+	private String		bc_code;
+	private int			b_num;
+	private String		m_id;
+	private String		m_name;
+	private String		m_pass;
+	private String		co_content;
 	private Timestamp	co_writedate;
-	private int		co_depth;
-	private	int		co_group;
-	private String	m_ip;
+	private int			co_depth;
+	private	int			co_group;
+	private String		m_ip;
+	private String		path;	// 대댓글의 계층을 구별하기 위함
 }

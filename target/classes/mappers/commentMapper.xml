@@ -6,12 +6,24 @@
 
 <mapper namespace="CommentDAO">
 	<!-- 댓글 불러오기 -->
+	<!-- depth가 0 이거나 -->
+	<!-- UNION ALL 위쪽에 있는 서브쿼리는 level 1 계층 (초기값, 최초값) 여기서 level은 path로 나타냈음 -->
+	<!-- 이후 행위를 정의한 Recurisive 서브쿼리. level 2 ~ ... -->
 	<select id="commentLoad" resultType="comment">
 		<![CDATA[
-			SELECT	* 
-			FROM	bd_comment 
-			WHERE bc_code = #{bc_code} AND b_num = #{b_num} 
-			ORDER BY co_idx;
+			WITH RECURSIVE CTE AS ( 
+				SELECT	co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, convert(co_idx, char) as path
+			    FROM	bd_comment 
+			    WHERE	co_group = 0 AND bc_code = #{bc_code} AND b_num = #{b_num}
+			    UNION ALL
+			    SELECT	b.co_idx, b.bc_code, b.b_num, b.m_id, b.m_name, b.m_pass, b.co_content, b.co_writedate, b.co_depth, b.co_group, b.m_ip, concat(CTE.co_idx, '-', b.co_idx) AS path
+			    FROM	bd_comment b INNER JOIN	CTE 
+			    ON 		b.co_group = CTE.co_idx 
+			    WHERE	b.bc_code = #{bc_code} AND b.b_num = #{b_num}
+			    )
+			    SELECT	co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, path 
+			    FROM	CTE	
+			    ORDER BY CONVERT(SUBSTRING_INDEX(path, '-', 1), UNSIGNED) ASC, co_idx ASC;
 		]]>
 		
 	</select>
@@ -20,9 +32,26 @@
 	<insert id="commentRegister" parameterType="comment">
 		<![CDATA[
 			INSERT INTO 
-			bd_comment	(bc_code, b_num, m_id, m_name, m_pass, co_content, m_ip)
-			VALUES		(#{bc_code}, #{b_num}, #{m_id}, #{m_name}, #{m_pass}, #{co_content}, #{m_ip})
+			bd_comment	(bc_code, b_num, m_id, m_name, m_pass, co_content, co_depth, co_group, m_ip)
+			VALUES		(#{bc_code}, #{b_num}, #{m_id}, #{m_name}, #{m_pass}, #{co_content}, #{co_depth}, #{co_group}, #{m_ip})
 		]]>
 	</insert>
+	
+	<!-- 댓글 삭제하기 -->
+	<delete id="commentDelete" parameterType="comment">
+		<![CDATA[
+			DELETE FROM bd_comment 
+			WHERE		bc_code = #{bc_code} AND b_num = #{b_num} AND co_idx = #{co_idx} 
+		]]>
+	</delete>
+	
+	<!-- 댓글 비밀번호 확인 -->
+	<select id="commentPassCheck" resultType="int">
+		<![CDATA[
+			SELECT	COUNT(*) 
+			FROM	bd_comment 
+			WHERE	bc_code = #{bc_code} AND b_num = #{b_num} AND co_idx = #{co_idx} AND m_pass = #{m_pass} 
+		]]>
+	</select>
 
 </mapper>

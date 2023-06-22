@@ -84,25 +84,6 @@ function commentLoad() {
       b_num: b_num,
     },
     success: function (data) {
-      // var commentHTML = "";
-
-      // alert(data); //[object Object],[object Object] ...
-      // if (data.length > 0) {
-      // commentHTML += "<div style='margin-bottom:10px;'></div>";
-      //   for (let i = 0; i < data.length; i++) {
-      //     commentHTML += "<div class='mb-2'>";
-
-      //     commentHTML += "<h6><strong>" + data[i].m_name + " (" + data[i].m_ip + ")</strong></h6>";
-      //     commentHTML += "<h6><strong>" + data[i].co_content + "</strong></h6>";
-      //     commentHTML += "</div>";
-      //     commentHTML += "<hr>";
-      //   }
-      // } else {
-
-      //   commentHTML += "<div class='mb-2' style='height: 100px; display : flex; justify-content : center; align-items : center;'>";
-      //   commentHTML += "<h6><strong>등록된 댓글이 없습니다.</strong></h6>";
-      //   commentHTML += "</div>";
-      // }
       $("#commentList").html(data);
     },
     error: function (e) {
@@ -130,6 +111,11 @@ function commentRegister() {
     return false;
   }
 
+  if (m_pass < 4) {
+    alert("비밀번호는 4자리 이상으로 해주세요");
+    return false;
+  }
+
   $.ajax({
     type: "post",
     url: "/comment/commentRegister",
@@ -141,10 +127,12 @@ function commentRegister() {
       m_name: m_name,
       m_pass: m_pass,
       co_content: co_content,
+      co_depth: 0,
     },
     success: function (data) {
       if (data == 1) {
         alert("게시글 등록이 완료되었습니다.");
+        $("#commentContent").val("");
         commentLoad();
       } else {
         alert("게시글 등록에 실패하였습니다.\n\n잠시후 다시 시도해주세요.");

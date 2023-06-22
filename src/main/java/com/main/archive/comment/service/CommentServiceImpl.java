@@ -46,4 +46,24 @@ public class CommentServiceImpl implements CommentService {
 		return commentDAO.commentRegister(commentDTO);
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
+	// 댓글 삭제하기
+	//-----------------------------------------------------------------------------------------------------------			
+	@Override
+	public int commentDelete(CommentDTO commentDTO) {
+
+		return commentDAO.commentDelete(commentDTO);
+	}
+
+
+	//-----------------------------------------------------------------------------------------------------------
+	// 댓글 비밀번호 확인
+	//-----------------------------------------------------------------------------------------------------------			
+	@Override
+	public int commentPassCheck(CommentDTO commentDTO) {
+		return commentDAO.commentPassCheck(commentDTO);
+	}
+	
+	
+
 }
