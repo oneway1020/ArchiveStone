@@ -31,5 +31,42 @@
 		]]>
 	</insert>
 	
+	<!-- 비밀번호 변경전 기존 비밀번호 확인 -->
+	<select id="passCheck" parameterType="user" resultType="int">
+		<![CDATA[
+			SELECT	COUNT(*) 
+			FROM	member 
+			WHERE	m_id = #{m_id} AND m_pass = #{m_pass} 
+		]]>
+	</select>
 	
+	<!-- 비밀번호 변경 -->
+	<update id="passChange" parameterType="user">
+		<![CDATA[
+			UPDATE	member
+			SET		m_pass	= #{m_pass}
+			WHERE	m_id	= #{m_id}
+		]]>
+		
+	</update>
+	
+	<!-- 게시글 정보 -->
+	<select id="tableInfo" resultType="board">
+		<![CDATA[
+			SELECT		b_idx, bc_code, b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good 
+			FROM		bd_board 
+			WHERE		m_id = #{m_id} 
+			ORDER BY	writetime 
+		]]>
+	</select>
+	
+	<!-- 댓글 정보 -->
+	<select id="commentInfo" resultType="comment">
+		<![CDATA[
+			SELECT		co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip 
+			FROM		bd_comment 
+			WHERE		m_id = #{m_id} 
+			ORDER BY	co_writedate 
+		]]>
+	</select>
 </mapper>

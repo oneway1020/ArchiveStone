@@ -34,9 +34,16 @@ function goRecordDetail(code, number) {
 // 게시글 검색
 function searchRecord() {
 
+	
 	let formObj = $("#formList");
 	
 	let typeStr = $("#searchType").find(":selected").val();
+
+	if(typeStr == "typeofSearch") {
+		alert("검색할 부분을 입력해주세요");
+		return;
+	}
+	
 	let searchKeyword = $("#searchKeyword").val();
 	
 	formObj.find("[name='searchType']").val(typeStr);

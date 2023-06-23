@@ -46,7 +46,7 @@
 	<!-- bc_code에 해당하는 게시판 게시글 가져오기 -->
 	<select id="recordList" resultType="board">
 		<![CDATA[
-			SELECT b_idx, bc_code, b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good
+			SELECT b_idx, bc_code, b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good 
 			FROM (	SELECT b_idx, bd_board.bc_code, b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good, ROW_NUMBER() OVER(ORDER BY b_idx DESC) as rNUM
 					FROM bd_board
 					WHERE bc_code = #{bc_code} 

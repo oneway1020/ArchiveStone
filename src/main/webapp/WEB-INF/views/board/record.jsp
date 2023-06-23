@@ -164,7 +164,7 @@
 		<!-- 검색버튼 -->
 		<div class="col-sm-offset-3">
 			<select id='searchType'>
-				<option >검색종류</option>
+				<option value="typeofSearch">검색종류</option>
 				<option value="t" <c:if test="${pageMaker.cri.searchType == 't'}">selected</c:if>>제목</option>
 				<option value="c" <c:if test="${pageMaker.cri.searchType == 'c'}">selected</c:if>>내용</option>
 				<option value="tc" <c:if test="${pageMaker.cri.searchType == 'tc'}">selected</c:if>>제목+내용</option>

@@ -1,8 +1,12 @@
 package com.main.archive.user.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.main.archive.board.dto.BoardDTO;
+import com.main.archive.comment.dto.CommentDTO;
 import com.main.archive.user.dao.UserDAO;
 import com.main.archive.user.dto.UserDTO;
 
@@ -40,6 +44,30 @@ public class UserServiceImpl implements UserService {
 		
 		int result = userDAO.signUp(userDTO);
 		return result;
+	}
+	
+	// 내정보와 일치하는 비밀번호 확인
+	@Override
+	public int passCheck(UserDTO userDTO) {
+		return userDAO.passCheck(userDTO);
+	}
+	
+	// 비밀번호 변경
+	@Override
+	public int passChange(UserDTO userDTO) {
+		return userDAO.passChange(userDTO);
+	}
+	
+	// 게시글 정보
+	@Override
+	public List<BoardDTO> tableInfo(UserDTO userDTO) {
+		return userDAO.tableInfo(userDTO);
+	}
+	
+	// 댓글 정보
+	@Override
+	public List<CommentDTO> commentInfo(UserDTO userDTO) {
+		return userDAO.commentInfo(userDTO);
 	}
 
 }

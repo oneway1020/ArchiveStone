@@ -3,6 +3,7 @@ package com.main.archive.user.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.main.archive.board.dto.BoardDTO;
+import com.main.archive.comment.dto.CommentDTO;
 import com.main.archive.common.util.ClientUtils;
 import com.main.archive.common.util.JwtService;
 import com.main.archive.user.dto.UserDTO;
@@ -143,14 +146,66 @@ public class UserController {
 	//-----------------------------------------------------------------------------------------------------------
 	// 내정보
 	//-----------------------------------------------------------------------------------------------------------	
-	@RequestMapping(value={"/myInfo/{m_id}", "/myInfo"}, method=RequestMethod.GET)
-	public String myInfo(@PathVariable(required = false) String m_id, UserDTO userDTO, Model model) {
-		if(m_id == null) {
-			m_id = "unKnown";
+	@RequestMapping(value={"/myInfo/{m_id}", "/myInfo/"}, method=RequestMethod.GET)
+	public String myInfo(@PathVariable(required = false) String m_id, Model model, HttpSession session) {
+		UserDTO userDTO = (UserDTO)session.getAttribute("user");
+//		System.out.println(userDTO.getM_id());
+		if(m_id == null || !m_id.equals(userDTO.getM_id())) {
 			return "/user/unKnownPage";
 		}
+
+		if(userDTO.getM_id().equals("admin")) {
+			return "/admin/adminInfo";
+		}
+		// 로그인 정보 (member 테이블)
+		model.addAttribute("user", userDTO);
+		
+		// 게시글 정보 (bd_board 테이블)
+		List<BoardDTO> boardDTO = userService.tableInfo(userDTO);
+		System.out.println("게시글 정보: " + boardDTO);
+		// 댓글 정보	(bd_comment 테이블)
+		List<CommentDTO> commentDTO = userService.commentInfo(userDTO);
+		System.out.println("댓글 정보: " + commentDTO);
 		// 가져와야할 것. 내 정보 (member테이블), 내가 쓴 글 (bd_board), 내가쓴 댓글
+		model.addAttribute("recordList", boardDTO);
+		model.addAttribute("commentList", commentDTO);
 		return "/user/myInfo";
 	}
 	
+	//-----------------------------------------------------------------------------------------------------------
+	// 내 정보 비밀번호 변경 뷰
+	//-----------------------------------------------------------------------------------------------------------	
+	@RequestMapping(value="/myInfo/changePass")
+	public String changePassForm(Model model, HttpSession session) {
+		UserDTO userDTO = (UserDTO)session.getAttribute("user");
+		
+		model.addAttribute("user", userDTO);
+		return "/user/changePass";
+		
+	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 내 정보 비밀번호 확인 결과
+	//-----------------------------------------------------------------------------------------------------------	
+	@ResponseBody
+	@RequestMapping(value="/myInfo/PassCheck", method=RequestMethod.POST)
+	public int changePassCheck(UserDTO userDTO, HttpSession session) {
+		UserDTO sessionInfo = (UserDTO)session.getAttribute("user");
+		userDTO.setM_id(sessionInfo.getM_id());
+//		System.out.println("입력정보 userDTO: " + userDTO);
+		int result = userService.passCheck(userDTO);
+		
+		return result;
+	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 비밀번호 변경
+	//-----------------------------------------------------------------------------------------------------------	
+	@ResponseBody
+	@RequestMapping(value="/myInfo/PassChange", method=RequestMethod.POST)
+	public int passChangeOK(UserDTO userDTO, HttpSession session) {
+		UserDTO sessionInfo = (UserDTO)session.getAttribute("user");
+		userDTO.setM_id(sessionInfo.getM_id());
+		int result = userService.passChange(userDTO);
+		
+		return result;
+	}
 }
