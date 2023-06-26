@@ -91,7 +91,7 @@
 				<div id="loginBox">
 					<input id="id" name="m_id" placeholder=" 아이디"/>
 					<div>
-						<input id="pass" name="m_pass" placeholder=" 비밀번호"/>
+						<input id="pass" name="m_pass" type="password" placeholder=" 비밀번호"/>
 						<button id="loginBtn"class="btn btn-primary" type="submit">로그인</button>
 					</div>
 					<div id="signUp">아이디가 없으신가요?

@@ -1,9 +1,20 @@
+// 띄어쓰기 체크
+var reg = /\s/g;
+
 // 아이디 중복체크
 function checkID() {
+
+
   if ($("#id").val() == "") {
     alert("사용하실 아이디를 입력해주세요");
     $("#id").focus();
     return false;
+  }
+  
+  if ($("#id").val().match(reg)) {
+  	alert("사용하실 아이디에는 띄어쓰기가 없어야 합니다.");
+  	$("#id").focus();
+  	return false;
   }
 
   if ($("#id").val().length < 4) {
@@ -58,7 +69,11 @@ function signUp() {
 		alert("아이디 중복체크를 해주세요");
 		return false;
 	}
-	
+	if (name.match(reg)) {
+  		alert("사용하실 닉네임에는 띄어쓰기가 없어야 합니다.");
+  		$("#name").focus();
+  		return false;
+  	}
 	if(name.length < 2) {
 		alert("닉네임은 2자리 이상으로 해주세요");
 		$("#name").focus();
@@ -71,6 +86,11 @@ function signUp() {
 		return false;
 	}
 	
+	if(pass.match(reg)) {
+		alert("사용하실 비밀번호에는 띄어쓰기가 없어야 합니다.");
+		$("#password").focus();
+		return false;
+	}
 	if(pass.length < 4) {
 		alert("비밀번호는 4자리 이상으로 해주세요");
 		$("#password").focus();

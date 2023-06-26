@@ -56,4 +56,22 @@ public class CommentDAOImpl implements CommentDAO {
 		return result;
 	}
 
+	//-----------------------------------------------------------------------------------------------------------
+	// bd_board 댓글 개수 업데이트
+	//-----------------------------------------------------------------------------------------------------------			
+	@Override
+	public void updateCommentCount(CommentDTO commentDTO) {
+		sqlSession.update(namespace + ".updateCommentCount", commentDTO);
+				
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// bd_board 댓글 개수 한개 감소
+	//-----------------------------------------------------------------------------------------------------------			
+	@Override
+	public void deleteCommentCount(CommentDTO commentDTO) {
+		sqlSession.update(namespace + ".deleteCommentCount", commentDTO);
+		
+	}
+
 }

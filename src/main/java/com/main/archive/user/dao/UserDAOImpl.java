@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.main.archive.board.dto.BoardDTO;
 import com.main.archive.comment.dto.CommentDTO;
+import com.main.archive.common.util.search.SearchCriteria;
 import com.main.archive.user.dto.UserDTO;
 
 @Repository
@@ -59,11 +60,39 @@ public class UserDAOImpl implements UserDAO {
 	public List<BoardDTO> tableInfo(UserDTO userDTO) {
 		return sqlSession.selectList(NAMESPACE + ".tableInfo", userDTO);
 	}
+	// 페이징
+	@Override
+	public List<BoardDTO> tableInfo(SearchCriteria cri) {
+		return sqlSession.selectList(NAMESPACE + ".tableInfoPaging", cri);
+	}
 
 	// 댓글 정보
 	@Override
 	public List<CommentDTO> commentInfo(UserDTO userDTO) {
 		return sqlSession.selectList(NAMESPACE + ".commentInfo", userDTO);
+	}
+	@Override
+	public List<CommentDTO> commentInfo(SearchCriteria cri) {
+		return sqlSession.selectList(NAMESPACE + ".commentInfoPaging", cri);
+	}
+
+	// 회원 탈퇴
+	@Override
+	public int removeID(UserDTO userDTO) {
+		return sqlSession.delete(NAMESPACE + ".removeID", userDTO);
+	}
+
+
+	// 유저 레코드 수
+	@Override
+	public int totalUserRecordCount(SearchCriteria cri) {
+		return sqlSession.selectOne(NAMESPACE + ".totalUserRecordCount", cri);
+	}
+
+	// 유저 댓글 수
+	@Override
+	public int totalUserCommentCount(SearchCriteria cri) {
+		return sqlSession.selectOne(NAMESPACE + ".totalUserCommentCount", cri);
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.main.archive.board.dto.BoardDTO;
 import com.main.archive.comment.dto.CommentDTO;
+import com.main.archive.common.util.search.SearchCriteria;
 import com.main.archive.user.dto.UserDTO;
 
 public interface UserService {
@@ -38,9 +39,26 @@ public interface UserService {
 	// 게시글 정보
 	//-----------------------------------------------------------------------------------------------------------	
 	public List<BoardDTO> tableInfo(UserDTO userDTO);
+	public List<BoardDTO> tableInfo(SearchCriteria cri);
 
 	//-----------------------------------------------------------------------------------------------------------
 	// 댓글 정보
 	//-----------------------------------------------------------------------------------------------------------	
 	public List<CommentDTO> commentInfo(UserDTO userDTO);
+	public List<CommentDTO> commentInfo(SearchCriteria cri);
+
+	//-----------------------------------------------------------------------------------------------------------
+	// 회원탈퇴 처리
+	//-----------------------------------------------------------------------------------------------------------	
+	public int removeID(UserDTO userDTO);
+
+	//-----------------------------------------------------------------------------------------------------------
+	// 총 유저 레코드 수
+	//-----------------------------------------------------------------------------------------------------------	
+	public int totalUserRecordCount(SearchCriteria cri);
+
+	//-----------------------------------------------------------------------------------------------------------
+	// 총 유저 댓글 수
+	//-----------------------------------------------------------------------------------------------------------		
+	public int totalUserCommentCount(SearchCriteria cri);
 }

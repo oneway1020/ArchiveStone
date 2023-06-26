@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.main.archive.board.dto.BoardDTO;
 import com.main.archive.comment.dto.CommentDTO;
+import com.main.archive.common.util.search.SearchCriteria;
 import com.main.archive.user.dao.UserDAO;
 import com.main.archive.user.dto.UserDTO;
 
@@ -63,11 +64,41 @@ public class UserServiceImpl implements UserService {
 	public List<BoardDTO> tableInfo(UserDTO userDTO) {
 		return userDAO.tableInfo(userDTO);
 	}
+	// 페이징
+	@Override
+	public List<BoardDTO> tableInfo(SearchCriteria cri) {
+		return userDAO.tableInfo(cri);
+	}
 	
 	// 댓글 정보
 	@Override
 	public List<CommentDTO> commentInfo(UserDTO userDTO) {
 		return userDAO.commentInfo(userDTO);
+	}
+	// 페이징
+	@Override
+	public List<CommentDTO> commentInfo(SearchCriteria cri) {
+		return userDAO.commentInfo(cri);
+	}
+	
+	// 회원 탈퇴
+	@Override
+	public int removeID(UserDTO userDTO) {
+		return userDAO.removeID(userDTO);
+	}
+
+
+	// 유저 레코드 수
+	@Override
+	public int totalUserRecordCount(SearchCriteria cri) {
+		return userDAO.totalUserRecordCount(cri);
+	}
+
+
+	// 유저 댓글 수
+	@Override
+	public int totalUserCommentCount(SearchCriteria cri) {
+		return userDAO.totalUserCommentCount(cri);
 	}
 
 }

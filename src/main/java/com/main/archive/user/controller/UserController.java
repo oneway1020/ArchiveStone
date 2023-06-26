@@ -21,6 +21,8 @@ import com.main.archive.board.dto.BoardDTO;
 import com.main.archive.comment.dto.CommentDTO;
 import com.main.archive.common.util.ClientUtils;
 import com.main.archive.common.util.JwtService;
+import com.main.archive.common.util.search.PageMaker;
+import com.main.archive.common.util.search.SearchCriteria;
 import com.main.archive.user.dto.UserDTO;
 import com.main.archive.user.service.UserService;
 
@@ -142,6 +144,24 @@ public class UserController {
 		
 		return "redirect:/";
 	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 회원탈퇴 처리
+	//-----------------------------------------------------------------------------------------------------------
+	@ResponseBody
+	@RequestMapping(value="/myInfo/removeID", method=RequestMethod.GET)
+	public int removeID(HttpServletRequest request, HttpSession session) {
+		UserDTO userDTO = (UserDTO)session.getAttribute("user");
+//		System.out.println("userDTO: " + userDTO);
+		int result = userService.removeID(userDTO);
+//		System.out.println("회원탈퇴 result: " + result);
+		if(result != 0) {
+			session.removeAttribute("user");
+			return result;
+		} else {
+			return result;			
+		}
+	}
+	
 	
 	//-----------------------------------------------------------------------------------------------------------
 	// 내정보
@@ -162,15 +182,62 @@ public class UserController {
 		
 		// 게시글 정보 (bd_board 테이블)
 		List<BoardDTO> boardDTO = userService.tableInfo(userDTO);
-		System.out.println("게시글 정보: " + boardDTO);
+		// 가져오는 게시글 레코드가 5개 초과로 존재하면
+		if(boardDTO.size() > 5) {
+			boardDTO = boardDTO.subList(0, 5);
+		}
+//		System.out.println("게시글 정보: " + boardDTO);
 		// 댓글 정보	(bd_comment 테이블)
 		List<CommentDTO> commentDTO = userService.commentInfo(userDTO);
-		System.out.println("댓글 정보: " + commentDTO);
+		// 가져오는 댓글 레코드가 5개 초과로 존재하면
+		if(commentDTO.size() > 5) {
+			commentDTO = commentDTO.subList(0, 5);
+		}
+//		System.out.println("댓글 정보: " + commentDTO);
 		// 가져와야할 것. 내 정보 (member테이블), 내가 쓴 글 (bd_board), 내가쓴 댓글
 		model.addAttribute("recordList", boardDTO);
 		model.addAttribute("commentList", commentDTO);
 		return "/user/myInfo";
 	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// 내정보 -> 게시글 전체정보 페이지
+	//-----------------------------------------------------------------------------------------------------------	
+	@RequestMapping(value="/myInfo/recordList")
+	public String recordListForm(
+			SearchCriteria cri, Model model, HttpSession session) {
+		UserDTO userDTO = (UserDTO)session.getAttribute("user");
+		cri.setM_id(userDTO.getM_id());
+		PageMaker pageMaker	= new PageMaker();
+		pageMaker.setCri(cri);
+		// 유저 게시글 총 레코드 수
+		pageMaker.setTotalCount(userService.totalUserRecordCount(cri));
+		// 게시글 정보 (bd_board 테이블)
+		List<BoardDTO> boardDTO = userService.tableInfo(cri);		
+		model.addAttribute("user", userDTO);
+		model.addAttribute("recordList", boardDTO);
+		model.addAttribute("pageMaker", pageMaker);
+		return "/user/recordListForm";
+	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 내정보 -> 댓글 전체정보 페이지
+	//-----------------------------------------------------------------------------------------------------------
+	@RequestMapping(value="/myInfo/commentList")
+	public String commentListForm(SearchCriteria cri, Model model, HttpSession session) {
+		UserDTO userDTO = (UserDTO)session.getAttribute("user");
+		cri.setM_id(userDTO.getM_id());
+		PageMaker pageMaker	= new PageMaker();
+		pageMaker.setCri(cri);
+		// 유저 댓글 총 레코드 수
+		pageMaker.setTotalCount(userService.totalUserCommentCount(cri));
+		// 댓글 정보	(bd_comment 테이블)
+		List<CommentDTO> commentDTO = userService.commentInfo(cri);
+		model.addAttribute("user", userDTO);
+		model.addAttribute("commentList", commentDTO);
+		model.addAttribute("pageMaker", pageMaker);
+		return "/user/commentListForm";
+	}
+	
 	
 	//-----------------------------------------------------------------------------------------------------------
 	// 내 정보 비밀번호 변경 뷰
@@ -181,6 +248,17 @@ public class UserController {
 		
 		model.addAttribute("user", userDTO);
 		return "/user/changePass";
+		
+	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 회원탈퇴 확인 뷰
+	//-----------------------------------------------------------------------------------------------------------	
+	@RequestMapping(value="/myInfo/removeIDPassCheck")
+	public String removeIDPassCheckForm(Model model, HttpSession session) {
+		UserDTO userDTO = (UserDTO)session.getAttribute("user");
+		
+		model.addAttribute("user", userDTO);
+		return "/user/removeCheck";
 		
 	}
 	//-----------------------------------------------------------------------------------------------------------

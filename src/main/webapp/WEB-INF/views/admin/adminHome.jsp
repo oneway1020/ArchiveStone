@@ -43,7 +43,7 @@
 						<a href="/admin/userInfo">회원정보</a>
 					</li>
 					<li>
-						<a href="/board/Q&A">Q&A응답</a>
+						<a href="/board/Q&A/record">Q&A응답</a>
 					</li>
 					<c:if test="${user.m_level == 0}">
 						<li>

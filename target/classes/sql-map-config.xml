@@ -8,7 +8,9 @@
 	<typeAliases>
 		<typeAlias alias="user" type="com.main.archive.user.dto.UserDTO"/>
 		<typeAlias alias="board" type="com.main.archive.board.dto.BoardDTO"/>
+		<typeAlias alias="qnaBoard" type="com.main.archive.board.dto.QnABoardDTO"/>		
 		<typeAlias alias="comment" type="com.main.archive.comment.dto.CommentDTO"/>
+		<typeAlias alias="qnaComment" type="com.main.archive.comment.dto.QnACommentDTO"/>
 		<typeAlias alias="searchCriteria" type="com.main.archive.common.util.search.SearchCriteria"/>
 	</typeAliases>
 </configuration>

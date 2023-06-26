@@ -56,6 +56,11 @@
 	  text-decoration: none;
 	  cursor: pointer;
 	}
+	.replyCommentUserInput {
+		float: left;
+		margin-right: 10px;
+		margin-top: 10px;	
+	}
 	
 </style>
 
@@ -94,7 +99,7 @@
 		<c:otherwise>
 			<c:forEach items="${commentList}" var="comment">
 				<c:choose>
-			 		<c:when test="${comment.co_depth == 0 }">
+			 		<c:when test="${comment.co_depth == 0 }">			 			
 						<!-- DB co_writedate 값 패턴변경 -->
 						<c:set var="writeTime"><fmt:formatDate value="${comment.co_writedate}" pattern="yyyy.MM.dd HH:mm:ss"/></c:set>
 							<div class="container yesComment">
@@ -134,19 +139,27 @@
 							<div style="clear:both;"></div>
 					</c:when>
 					<c:when test="${comment.co_depth == 1 }">
+						<c:if test="${comment.msg == 'idDelete' }">
+						<div class="container yesComment">
+							<span class="col-sm-8" style="margin-left: 5px;">
+								댓글 작성자가 삭제한 댓글입니다.
+							</span>
+						</div>
+						</c:if>
 						<!-- DB co_writedate 값 패턴변경 -->
 						<c:set var="writeTime"><fmt:formatDate value="${comment.co_writedate}" pattern="yyyy.MM.dd HH:mm:ss"/></c:set>
-							<div class="yesComment container" style="background-color:rgba(80, 80, 80, 0.2);">
+							<div class="container" >
+								<div class="container yesComment" style="background-color:rgba(80, 80, 80, 0.2);">
 								<c:choose>
 								<c:when test="${comment.m_id ne 'Anonymous'}">
 									<span class="col-sm-2">
-										<i class="bi bi-arrow-return-right"></i>
+										&nbsp;<i class="bi bi-arrow-return-right"></i>
 										<b>${comment.m_name} (${comment.m_ip})</b>
 									</span>
 								</c:when>
 								<c:otherwise>
 									<span class="col-sm-2">
-										<i class="bi bi-arrow-return-right"></i>
+										&nbsp;<i class="bi bi-arrow-return-right"></i>
 										${comment.m_name} (${comment.m_ip})
 									</span>
 								</c:otherwise>
@@ -171,41 +184,42 @@
 										</c:otherwise>
 									</c:choose>
 								</span>
+								</div>
 							</div>
 							<div style="clear:both;"></div>
 					</c:when>
 				</c:choose>
 
 							
-							<!-- 대댓글 창 -->
-							<div id="replyCommentInputWrapper${comment.co_idx}">
-							<div class="replyCommentInput toggleHidden">
-								<div class="replyCommentUserInput">
-									<c:choose>
-										<c:when test="${user != null }">
-											<input id="commentNameInput${comment.co_idx}" class="loginUserCommentName" value="${user.m_name}"/>
-											<input hidden="hidden" id="m_id${comment.co_idx}" name="m_id" value="${user.m_id}"/>
-										</c:when>
-										<c:otherwise>
-											<div>
-												<input style="margin-bottom: 5px;" id="commentNameInput${comment.co_idx}" placeholder="닉네임"/>
-											</div>
-											<div>
-												<input id="commentPass${comment.co_idx}" type="password" placeholder="비밀번호"/>
-											</div>
-											<input hidden="hidden" id="m_id${comment.co_idx}" name="m_id" value="Anonymous"/>
-										</c:otherwise>
-									</c:choose>
-								</div>
-								<div class="replyCommentTextInput">
-									<textarea id="commentContent${comment.co_idx}" rows="3" cols="95" style="resize: none;"></textarea>
-									<div style="clear:both;"></div>
-									<button class="replyBtn btn btn-primary" style="float: right;" type="button">등록</button>
-									<input hidden="hidden" value="${comment.co_idx}"/>
-								</div>
-								<div style="clear:both;"></div>
-							</div>
-							</div>
+					<!-- 대댓글 창 -->
+					<div id="replyCommentInputWrapper${comment.co_idx}" style="border-bottom: 1px solid rgba(80, 80, 80, .2); display: flex; justify-content: center;">
+					<div class="replyCommentInput toggleHidden">
+						<div class="replyCommentUserInput">
+							<c:choose>
+								<c:when test="${user != null }">
+									<input id="commentNameInput${comment.co_idx}" class="loginUserCommentName" value="${user.m_name}"/>
+									<input hidden="hidden" id="m_id${comment.co_idx}" name="m_id" value="${user.m_id}"/>
+								</c:when>
+								<c:otherwise>
+									<div>
+										<input style="margin-bottom: 5px;" id="commentNameInput${comment.co_idx}" placeholder="닉네임"/>
+									</div>
+									<div>
+										<input id="commentPass${comment.co_idx}" type="password" placeholder="비밀번호"/>
+									</div>
+									<input hidden="hidden" id="m_id${comment.co_idx}" name="m_id" value="Anonymous"/>
+								</c:otherwise>
+							</c:choose>
+						</div>
+						<div class="replyCommentTextInput">
+							<textarea id="commentContent${comment.co_idx}" rows="3" cols="95" style="resize: none;"></textarea>
+							<div style="clear:both;"></div>
+							<button class="replyBtn btn btn-primary" style="float: right;" type="button">등록</button>
+							<input hidden="hidden" value="${comment.co_idx}"/>
+						</div>
+						<div style="clear:both;"></div>
+					</div>
+					</div>
 				
 			</c:forEach>
 		</c:otherwise>

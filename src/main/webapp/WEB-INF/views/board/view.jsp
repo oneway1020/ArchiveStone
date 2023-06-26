@@ -109,7 +109,7 @@
 	
 	<main class="container" style="margin-top: 20px;">
 	
-	<h3 style="margin-bottom: 20px;"><a style="color: black; text-decoration: none;" href='<c:url value="/board/record?bc_code=${pageMaker.cri.bc_code}"/>'>${recordList[0].bc_name} 게시판</a></h3>
+	<h3 style="margin-bottom: 20px;"><a style="color: black; text-decoration: none;" href='<c:url value="/board/record?bc_code=${pageMaker.cri.bc_code}"/>'>${title} 게시판</a></h3>
 	<input hidden="hidden" id="hiddenBc_code" value="${recordOne.bc_code}"/>
 	<input hidden="hidden" id="hiddenB_num" value="${recordOne.b_num}"/>
 	<!-- view 내용 -->
@@ -154,7 +154,7 @@
 				</div>
 			</div>
 		</div>
-
+		<p>전체 댓글: <b>${recordOne.b_reply}</b>개</p>
 		<div id="commentList">
 		</div>
 		
@@ -245,7 +245,7 @@
 								</c:set>
 									<tr>
 										<td align="center">${recordList.b_num}</td>
-										<td><a class="title_a" onclick="goRecordDetail('${recordOne.bc_code}', '${recordList.b_num}');">${recordList.title}</a></td>
+										<td><a class="title_a" onclick="goRecordDetail('${recordOne.bc_code}', '${recordList.b_num}');">${recordList.title} [${recordList.b_reply}]</a></td>
 										<c:choose>
 											<c:when test="${recordList.m_id ne null and recordList.m_id ne 'Anonymous'}">
 												<td align="right"><b>${recordList.m_name} (${recordList.m_ip})</b></td>

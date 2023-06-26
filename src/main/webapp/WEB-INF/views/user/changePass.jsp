@@ -6,12 +6,7 @@
 <meta charset="UTF-8">
 <title>비밀번호 변경</title>
 </head>
-<style>
-	#changePassBox {
-		display: none;
-	}
-	
-</style>
+
 <body>
 	<jsp:include page="../common/header.jsp" flush="false"/>
 	<main class="container" style="margin-top: 100px;">
@@ -23,7 +18,7 @@
 			</div>
 			<div id="nowinputWrapper">
 				<input id="checkPass" type="password" oninput="bibunbakkum();"/>
-				<button type="button" onclick="checkPass();">비밀번호 확인</button>
+				<button type="button" onclick="checkPassForModify();">비밀번호 확인</button>
 				<input hidden="hidden" id="checkOK" value="">
 			</div>
 			<div id="changespanWrapper">

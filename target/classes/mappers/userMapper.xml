@@ -53,20 +53,93 @@
 	<!-- 게시글 정보 -->
 	<select id="tableInfo" resultType="board">
 		<![CDATA[
-			SELECT		b_idx, bc_code, b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good 
-			FROM		bd_board 
+			SELECT		b.b_idx, b.bc_code, b.b_num, b.b_reply, b.m_id, b.m_name, b.m_pass, b.m_ip, b.title, b.content, b.writetime, b.b_cnt, b.b_good, c.bc_name 
+			FROM		bd_board b JOIN bd_board_config c 
+			ON			b.bc_code = c.bc_code 
 			WHERE		m_id = #{m_id} 
-			ORDER BY	writetime 
+			ORDER BY	writetime DESC
+		]]>
+	</select>
+	<!-- 게시글 정보 + 페이징 -->
+	<select id="tableInfoPaging" resultType="board">
+		<![CDATA[
+			SELECT		b_idx, bc_code, b_num, b_reply, m_id, m_name, m_pass, m_ip, title, content, writetime, b_cnt, b_good, bc_name 
+			FROM		(	SELECT		b.b_idx, b.bc_code, b.b_num, b.b_reply, b.m_id, b.m_name, b.m_pass, b.m_ip, b.title, b.content, b.writetime, b.b_cnt, b.b_good, c.bc_name, ROW_NUMBER() OVER(ORDER BY b_idx DESC) as rNUM
+							FROM		bd_board b JOIN bd_board_config c 
+							ON			b.bc_code = c.bc_code 
+                            WHERE		m_id = #{m_id} 
+                        ]]>
+                        <include refid = "searchMySQL"/>
+                        <![CDATA[
+                        )	brd
+			WHERE		brd.rNUM BETWEEN #{perPageNum}*(#{page}-1) + 1 AND #{perPageNum}*(#{page}-1)+#{perPageNum}
+			ORDER BY	writetime DESC
+        ]]>
+	</select>
+	
+	<!-- 유저 게시글 총 개수 -->
+	<select id="totalUserRecordCount" parameterType="searchCriteria" resultType="Integer">
+		<![CDATA[
+			SELECT	COUNT(*) 
+			FROM	bd_board 
+			WHERE	m_id = #{m_id}
+		]]>
+	</select>
+	<!-- 유저 댓글 총 개수 -->
+	<select id="totalUserCommentCount" parameterType="searchCriteria" resultType="Integer">
+		<![CDATA[
+			SELECT	COUNT(*) 
+			FROM	bd_comment 
+			WHERE	m_id = #{m_id}
 		]]>
 	</select>
 	
 	<!-- 댓글 정보 -->
 	<select id="commentInfo" resultType="comment">
 		<![CDATA[
-			SELECT		co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip 
-			FROM		bd_comment 
-			WHERE		m_id = #{m_id} 
-			ORDER BY	co_writedate 
+			SELECT		b.co_idx, b.bc_code, b.b_num, b.m_id, b.m_name, b.m_pass, b.co_content, b.co_writedate, b.co_depth, b.co_group, b.m_ip, c.bc_name, d.title 
+			FROM		bd_comment b INNER JOIN bd_board_config c 
+			ON			b.bc_code = c.bc_code INNER JOIN bd_board d 
+            ON			b.bc_code = d.bc_code AND b.b_num = d.b_num 
+			WHERE		b.m_id = #{m_id} 
+			ORDER BY	co_writedate DESC
 		]]>
 	</select>
+	<!-- 댓글 정보 + 페이징 -->
+	<select id="commentInfoPaging" resultType="comment">
+		<![CDATA[
+			SELECT		co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, bc_name, title  
+            FROM		(	SELECT	b.co_idx, b.bc_code, b.b_num, b.m_id, b.m_name, b.m_pass, b.co_content, b.co_writedate, b.co_depth, b.co_group, b.m_ip, c.bc_name, d.title, ROW_NUMBER() OVER(ORDER BY b_idx DESC) as rNUM 
+							FROM		bd_comment b INNER JOIN bd_board_config c 
+							ON			b.bc_code = c.bc_code INNER JOIN bd_board d 
+							ON			b.bc_code = d.bc_code AND b.b_num = d.b_num 
+							WHERE		b.m_id = #{m_id} 
+						]]>
+						<include refid = "searchMySQL"/>
+						<![CDATA[
+						)	brd
+			WHERE		brd.rNUM BETWEEN #{perPageNum}*(#{page}-1) + 1 AND #{perPageNum}*(#{page}-1)+#{perPageNum}
+			ORDER BY	co_writedate DESC
+		]]>
+	</select>
+	
+	<!-- 회원 탈퇴 -->
+	<select id="removeID" parameterType="user">
+		<![CDATA[
+			DELETE FROM member 
+			WHERE		m_id = #{m_id}
+		]]>
+	</select>
+	
+	<!-- 검색어 설정을 위한 sql문 -->
+	<sql id="searchMySQL">
+		<if test="searchType != null">
+			<if test="searchType == 'record'.toString()">
+				AND title LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+			<if test="searchType == 'comment'.toString()">
+				AND co_content LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</if>
+	</sql>
 </mapper>

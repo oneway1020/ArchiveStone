@@ -10,6 +10,7 @@
 	<!-- UNION ALL 위쪽에 있는 서브쿼리는 level 1 계층 (초기값, 최초값) 여기서 level은 path로 나타냈음 -->
 	<!-- 이후 행위를 정의한 Recurisive 서브쿼리. level 2 ~ ... -->
 	<select id="commentLoad" resultType="comment">
+	<!-- 
 		<![CDATA[
 			WITH RECURSIVE CTE AS ( 
 				SELECT	co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, convert(co_idx, char) as path
@@ -25,7 +26,33 @@
 			    FROM	CTE	
 			    ORDER BY CONVERT(SUBSTRING_INDEX(path, '-', 1), UNSIGNED) ASC, co_idx ASC;
 		]]>
-		
+	 -->
+	 <!-- 
+		<![CDATA[
+				SELECT	co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, convert(co_idx, char) as path
+			    FROM	bd_comment 
+			    WHERE	co_group = 0 AND bc_code = #{bc_code} AND b_num = #{b_num}
+				UNION ALL
+				SELECT	co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, CONCAT(co_group, '-', co_idx) as path
+			    FROM	bd_comment
+			    WHERE	co_group > 0 AND bc_code = #{bc_code} AND b_num = #{b_num}
+			    ORDER BY	CONVERT(SUBSTRING_INDEX(path, '-', 1), UNSIGNED) ASC;
+		]]>
+	  -->
+	  <![CDATA[
+			  	SELECT co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, path, IF(path != co_idx AND CONVERT(SUBSTRING_INDEX(path, '-', 1), UNSIGNED) != prevPath, "idDelete", null) as msg FROM (
+					 SELECT co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, path, IFNULL(LAG(CONVERT(SUBSTRING_INDEX(path, '-', 1), UNSIGNED)) OVER (ORDER BY path), '') AS prevPath FROM (
+						SELECT	co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, convert(co_idx, char) as path
+					    FROM	bd_comment 
+					    WHERE	co_group = 0 AND bc_code= #{bc_code} AND b_num = #{b_num}
+						UNION ALL
+						SELECT	co_idx, bc_code, b_num, m_id, m_name, m_pass, co_content, co_writedate, co_depth, co_group, m_ip, CONCAT(co_group, '-', co_idx) as path
+					    FROM	bd_comment
+					    WHERE	co_group > 0 AND bc_code= #{bc_code} AND b_num = #{b_num}
+					    ORDER BY	CONVERT(SUBSTRING_INDEX(path, '-', 1), UNSIGNED) ASC) a) b
+					WHERE bc_code= #{bc_code} AND b_num = #{b_num}
+					ORDER BY CONVERT(SUBSTRING_INDEX(path, '-', 1), UNSIGNED) ASC;
+	  ]]>
 	</select>
 	
 	<!-- 댓글 등록하기 -->
@@ -35,6 +62,13 @@
 			bd_comment	(bc_code, b_num, m_id, m_name, m_pass, co_content, co_depth, co_group, m_ip)
 			VALUES		(#{bc_code}, #{b_num}, #{m_id}, #{m_name}, #{m_pass}, #{co_content}, #{co_depth}, #{co_group}, #{m_ip})
 		]]>
+		<selectKey keyProperty="commentCount" resultType="Int" order="AFTER">
+			<![CDATA[
+				SELECT	COUNT(*)
+				FROM	bd_comment 
+				WHERE	bc_code = #{bc_code} AND b_num = #{b_num} 
+			]]>
+		</selectKey>
 	</insert>
 	
 	<!-- 댓글 삭제하기 -->
@@ -42,7 +76,7 @@
 		<![CDATA[
 			DELETE FROM bd_comment 
 			WHERE		bc_code = #{bc_code} AND b_num = #{b_num} AND co_idx = #{co_idx} 
-		]]>
+		]]>		
 	</delete>
 	
 	<!-- 댓글 비밀번호 확인 -->
@@ -52,6 +86,22 @@
 			FROM	bd_comment 
 			WHERE	bc_code = #{bc_code} AND b_num = #{b_num} AND co_idx = #{co_idx} AND m_pass = #{m_pass} 
 		]]>
+
 	</select>
 
+	<!-- bd_board 댓글 개수 업데이트 -->
+	<update id="updateCommentCount" parameterType="comment">
+		<![CDATA[
+			UPDATE	bd_board 
+			SET		b_reply = #{commentCount} 
+			WHERE	bc_code = #{bc_code} AND b_num = #{b_num}
+		]]>
+	</update>
+	<update id="deleteCommentCount" parameterType="comment">
+		<![CDATA[
+			UPDATE	bd_board
+			SET		b_reply = b_reply - 1 
+			WHERE	bc_code = #{bc_code} AND b_num = #{b_num}
+		]]>
+	</update>
 </mapper>

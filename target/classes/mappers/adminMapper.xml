@@ -4,13 +4,39 @@
    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
    
 <mapper namespace="AdminDAO">
+	<!-- 가입한 유저 목록 -->
 	<select id="userListAll" resultType="user">
 		<![CDATA[
 			SELECT * 
 			FROM member 
-			WHERE 1=1 
-			ORDER BY j_time
+			WHERE m_id != 'admin' 
+			]]>
+			<include refid = "searchUserSQL"/>
+			<![CDATA[
+			ORDER BY j_time DESC
 		]]>
 	</select>
 	
+	<!-- 유저 삭제 -->
+	<delete id="deleteUser" parameterType="user">
+		<![CDATA[
+			DELETE	FROM member 
+			WHERE	m_idx = #{m_idx} 
+		]]>
+	</delete>
+	
+	<!-- 게시판 생성 -->
+	<select id="createBoard" parameterType="board">
+		<![CDATA[
+			INSERT INTO bd_board_config(bc_code, bc_name) 
+			VALUES(#{bc_code}, #{bc_name})
+		]]>
+	</select>
+	
+	<!-- 회원 아이디 검색을 위한 sql문 -->
+	<sql id="searchUserSQL">
+		<if test="keyword != null">
+			AND m_id LIKE CONCAT ('%', #{keyword}, '%')
+		</if>
+	</sql>
 </mapper>

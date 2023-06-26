@@ -12,6 +12,7 @@ import lombok.Data;
 public class BoardDTO {
 	
 	// bd_board 정보
+	private	int	b_idx;			// 게시글 고유번호(기본키)
 	private int b_num;			// 게시글 번호
 	private String b_reply;		// 댓글 정보
 	private String m_id;		// 작성자 id
@@ -24,6 +25,9 @@ public class BoardDTO {
 	private int b_good;			// 추천수
 	private Timestamp writetime;// 작성시간
 	
+	
+	// member 정보
+	private int m_idx;			// 유저 개별 정보
 	
 	// bd_board_config와 공유하는 정보
 	private String bc_code;		// 게시판 이름 별 code

@@ -13,7 +13,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${param.bc_code}</title>
+<title>Q&amp;A 게시판</title>
 </head>
 <style>
 	.postTypeBtnWrapper {
@@ -40,14 +40,13 @@
 	<jsp:include page="../common/header.jsp" flush="false"/>
 	
 	<main class="container" style="margin-top: 20px;">
-	<h3 style="margin-bottom: 20px;"><a style="color: black; text-decoration: none;" href='<c:url value="/board/record?bc_code=${pageMaker.cri.bc_code}"/>'>${title} 게시판</a></h3>
+	<h3 style="margin-bottom: 20px;"><a style="color: black; text-decoration: none;" href='<c:url value="/board/Q&A/record"/>'>Q&amp;A 게시판</a></h3>
 	
 		<div class="postTypeBtnWrapper">
-			<button class="btn btn-primary" type="button" onclick="total('${param.bc_code}');">전체글</button>
-			<button class="btn btn-secondary" type="button" onclick="recommend('${param.bc_code}');">인기글</button>
+			<button class="btn btn-primary totalRecord" type="button">전체글</button>
 		</div>
 		<div class="writeBtnWrapper">
-			<button class="btn btn-light" type="button" onclick="recordRegister('${param.bc_code}');">글쓰기</button>
+			<button class="btn btn-light" type="button" onclick="qnaRecordRegister();">글쓰기</button>
 		</div>
 		<div style="clear:both;"></div>
 		
@@ -62,8 +61,6 @@
 						<th class="col-sm-4 text-center">제목</th>
 						<th class="col-sm-1 text-center">글쓴이</th>
 						<th class="col-sm-1 text-center">작성일</th>
-						<th class="col-sm-1 text-center">조회수</th>
-						<th class="col-sm-1 text-center">추천수</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -89,19 +86,10 @@
 									</c:if>
 								</c:set>								
 									<tr>
-										<td align="center">${recordList.b_num}</td>
-										<td><a class="title_a" onclick="goRecordDetail('${recordList.bc_code}', '${recordList.b_num}');">${recordList.title} [${recordList.b_reply}]</a></td>
-										<c:choose>
-											<c:when test="${recordList.m_id ne null and recordList.m_id ne 'Anonymous'}">
-												<td align="right"><b>${recordList.m_name} (${recordList.m_ip})</b></td>
-											</c:when>
-											<c:otherwise>
-												<td align="right">${recordList.m_name} (${recordList.m_ip})</td>
-											</c:otherwise>
-										</c:choose>
+										<td align="center">${recordList.q_num}</td>
+										<td><a class="title_a" onclick="goQnARecordDetail('${recordList.m_idx }','${recordList.q_num}');">${recordList.title} [${recordList.q_reply}]</a></td>
+										<td align="right"><b>${recordList.m_name} (${recordList.m_ip})</b></td>
 										<td align="right">${day_comparison}</td>
-										<td align="right">${recordList.b_cnt}</td>
-										<td align="right">${recordList.b_good}</td>
 									</tr>
 								</c:forEach>
 						</c:otherwise>
@@ -112,11 +100,10 @@
 
 
 		<div class="postTypeBtnWrapper">
-			<button class="btn btn-primary" type="button" onclick="total('${param.bc_code}');">전체글</button>
-			<button class="btn btn-secondary" type="button" onclick="recommend('${param.bc_code}');">인기글</button>
+			<button class="btn btn-primary totalRecord" type="button">전체글</button>
 		</div>
 		<div class="writeBtnWrapper">
-			<button class="btn btn-light" type="button" onclick="recordRegister('${param.bc_code}');">글쓰기</button>
+			<button class="btn btn-light" type="button" onclick="qnaRecordRegister();">글쓰기</button>
 		</div>
 		<div style="clear:both;"></div>
 			
@@ -128,7 +115,7 @@
 			<ul class="btn-group pagination">
 			    <c:if test="${pageMaker.prev}">
 				    <li>
-				        <a class="btn btn-outline-secondary" href='<c:url value="/board/record?bc_code=${pageMaker.cri.bc_code}&searchType=${pageMaker.cri.searchType}&keyword=${pageMaker.cri.keyword}&page=${pageMaker.startPage-1}"/>'><i class="bi bi-chevron-double-left"></i></a>
+				        <a class="btn btn-outline-secondary" href='<c:url value="/board/Q&A/record?searchType=${pageMaker.cri.searchType}&keyword=${pageMaker.cri.keyword}&page=${pageMaker.startPage-1}"/>'><i class="bi bi-chevron-double-left"></i></a>
 				    </li>
 			    </c:if>
 			    <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" var="pageNum">
@@ -145,14 +132,14 @@
 						</c:when>
 						<c:otherwise>
 							<li>
-						        <a class="btn btn-outline-secondary" href='<c:url value="/board/record?bc_code=${pageMaker.cri.bc_code}&searchType=${param.searchType}&keyword=${param.keyword}&page=${pageNum}"/>'><i>${pageNum}</i></a>
+						        <a class="btn btn-outline-secondary" href='<c:url value="/board/Q&A/record?searchType=${param.searchType}&keyword=${param.keyword}&page=${pageNum}"/>'><i>${pageNum}</i></a>
 						    </li>
 						</c:otherwise>
 					</c:choose>
 			    </c:forEach>
 			    <c:if test="${pageMaker.next && pageMaker.endPage > 0}">
 				    <li>
-				        <a class="btn btn-outline-secondary" href='<c:url value="/board/record?bc_code=${pageMaker.cri.bc_code}&searchType=${pageMaker.cri.searchType}&keyword=${pageMaker.cri.keyword}&page=${pageMaker.endPage+1}"/>'><i class="bi bi-chevron-double-right"></i></a>
+				        <a class="btn btn-outline-secondary" href='<c:url value="/board/Q&A/record?searchType=${pageMaker.cri.searchType}&keyword=${pageMaker.cri.keyword}&page=${pageMaker.endPage+1}"/>'><i class="bi bi-chevron-double-right"></i></a>
 				    </li>
 			    </c:if>
 			</ul>
@@ -168,17 +155,15 @@
 				<option value="t" <c:if test="${pageMaker.cri.searchType == 't'}">selected</c:if>>제목</option>
 				<option value="c" <c:if test="${pageMaker.cri.searchType == 'c'}">selected</c:if>>내용</option>
 				<option value="tc" <c:if test="${pageMaker.cri.searchType == 'tc'}">selected</c:if>>제목+내용</option>
-				<option value="u" <c:if test="${pageMaker.cri.searchType == 'u'}">selected</c:if>>글쓴이</option>
 			</select>
 			<input type='text' id='searchKeyword' value="${pageMaker.cri.keyword}" onkeypress="if( event.keyCode == 13 ){searchRecord();}">
 			<button class="btn btn-primary" type="button" id='searchBtn' onclick="searchRecord();">검색</button> 
 		</div>
 		<!-- 검색데이터 넣어놓는 hidden input -->
-		<form id="formList" action="/board/record" method="get">
+		<form id="formList" action="/board/Q&A/record" method="get">
 			<input type="hidden" name="page"/>
 			<input type="hidden" name="searchType"/>
 			<input type="hidden" name="keyword"/>
-			<input type="hidden" name="bc_code" value="${pageMaker.cri.bc_code}"/>
 		</form>
 
 	</main>

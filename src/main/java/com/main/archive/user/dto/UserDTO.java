@@ -1,5 +1,7 @@
 package com.main.archive.user.dto;
 
+import java.sql.Timestamp;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +17,7 @@ public class UserDTO {
 	private String	m_pass;
 	private int		m_level;
 	private String	j_ip;
+	private Timestamp j_time;
+
 	
 }

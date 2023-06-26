@@ -18,4 +18,10 @@ public interface CommentDAO {
 	// 댓글 비밀번호 확인
 	public int commentPassCheck(CommentDTO commentDTO);
 
+	// 댓글 개수 업데이트
+	public void updateCommentCount(CommentDTO commentDTO);
+
+	// 댓글 개수 한 개 감소
+	public void deleteCommentCount(CommentDTO commentDTO);
+
 }

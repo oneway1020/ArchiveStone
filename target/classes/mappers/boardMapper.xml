@@ -5,6 +5,16 @@
 
 
 <mapper namespace="BoardDAO">
+	<!-- 게시판 이름 가져오기 -->
+	<select id="getBoardName" parameterType="string" resultType="string">
+		<![CDATA[
+			SELECT	bc_name 
+			FROM	bd_board_config
+			WHERE	bc_code = #{bc_code}
+		]]>
+		
+	</select>
+
 	<!-- 아이피 정보 가져오기 -->
 	<select id="ipCheck" resultType="board">
 		<![CDATA[
@@ -75,6 +85,15 @@
 			]]>
 		</selectKey>
 	</insert>
+	<!-- 게시글 등록하기 (QnA) -->
+	<insert id="qnaBoardRegister" parameterType="qnaBoard">
+		<![CDATA[
+			INSERT INTO qna_board 
+						( q_num, m_id, m_name, m_ip, title, content, m_idx )
+			VALUES 		((SELECT IFNULL(max(q_num), 0) + 1 FROM qna_board as t WHERE m_idx = #{m_idx}), #{m_id}, #{m_name}, #{m_ip}, #{title}, #{content}, #{m_idx} )
+		]]>
+	</insert>
+	
 	
 	<!-- 추천비추 레코드 생성 -->
 	<insert id="createGbRecord" parameterType="board">
@@ -168,7 +187,15 @@
 			WHERE 1 = 1 AND bc_code = #{bc_code}
 		]]>
 	</select>
-	
+	<!-- 게시판 게시글 수 구하기 (QnA) -->
+	<select id="totalQnABoardRecordCount" parameterType="searchCriteria" resultType="Integer">
+		<![CDATA[
+			SELECT COUNT(*) 
+			FROM qna_board 
+			WHERE 1 = 1 
+		]]>
+		<include refid = "isUserOrAdminSQL"/>
+	</select>	
 	
 	<!-- 게시글 조회수 올리기 -->
 	<update id="updateReadCount" parameterType="searchCriteria">
@@ -186,6 +213,14 @@
 			FROM	bd_board JOIN bd_good_bad
 			WHERE	bd_board.bc_code = #{bc_code}	AND bd_good_bad.bc_code = #{bc_code} 
 			AND 	bd_board.b_num = #{b_num}		AND bd_good_bad.b_num = #{b_num}
+		]]>
+	</select>
+	<!-- QnA 게시글 정보 조회 -->
+	<select id="qnaboardRecordDetail" resultType="qnaBoard">
+		<![CDATA[
+			SELECT	q_idx, q_num, q_reply, m_id, m_name, m_ip, title, content, writetime, m_idx 
+			FROM	qna_board 
+			WHERE	m_idx = #{m_idx} AND q_num = #{q_num}
 		]]>
 	</select>
 	
@@ -240,6 +275,56 @@
 		]]>
 	</delete>
 	
+	<!-- QnA 게시판 게시글 가져오기 + 페이징 -->
+	<select id="getQnaRecord" resultType="qnaBoard">
+		<![CDATA[
+			SELECT	q_idx, q_num, q_reply, m_id, m_name, m_ip, title, content, writetime, m_idx 
+			FROM	(	SELECT	q_idx, q_num, q_reply, m_id, m_name, m_ip, title, content, writetime, m_idx, ROW_NUMBER() OVER(ORDER BY q_idx DESC) as rNUM 
+						FROM	qna_board 
+						WHERE	1=1 
+			]]>
+			<include refid = "isUserOrAdminSQL"/>
+			<include refid = "searchMySQL"/>
+			<![CDATA[
+					) brd
+				WHERE brd.rNUM BETWEEN #{perPageNum}*(#{page}-1) + 1 AND #{perPageNum}*(#{page}-1)+#{perPageNum} 
+				ORDER BY writetime DESC
+			]]>
+	</select>
+	
+	<!-- 관리자 댓글 등록 -->
+	<insert id="adminCommentRegister" parameterType="qnaComment">
+		<![CDATA[
+			INSERT INTO 
+			qna_comment	( q_num, m_id, m_name, qo_content, m_idx) 
+			VALUES		( #{q_num}, #{m_id}, #{m_name}, #{qo_content}, #{m_idx})
+		]]>
+		<selectKey keyProperty="adminCommentCount" resultType="Int" order="AFTER">
+			<![CDATA[
+				SELECT	COUNT(*) 
+				FROM	qna_comment 
+				WHERE	q_num = #{q_num} AND m_idx = #{m_idx}
+			]]>
+		</selectKey>
+	</insert>
+	<!-- qna_board 댓글 개수 업데이트 -->
+	<update id="updateAdminCommentCount" parameterType="qnaComment">
+		<![CDATA[
+			UPDATE	qna_board 
+			SET		q_reply = #{adminCommentCount} 
+			WHERE	q_num = #{q_num} AND m_idx = #{m_idx} 
+		]]>
+	</update>
+	<!-- QnA 관리자 댓글 불러오기 -->
+	<select id="adminCommentLoad" resultType="qnaComment">
+		<![CDATA[
+			SELECT	qo_idx, q_num, m_id, m_name, qo_content, qo_writetime, m_id, m_idx 
+			FROM	qna_comment 
+			WHERE	q_num = #{q_num} AND m_idx = #{m_idx}
+		]]>
+		<include refid = "isUserOrAdminSQL"/>
+	</select>
+
 	<!-- 검색에 대한 부분을 위한 sql문 -->
 	<sql id="searchMySQL">
 		<if test="searchType != null">
@@ -271,6 +356,13 @@
 		</if>
 		<if test="bad == 1">
 			AND	bad = 1
+		</if>
+	</sql>
+	
+	<!-- 유저인지 관리자인지 확인을 위한 sql문 -->
+	<sql id="isUserOrAdminSQL">
+		<if test="m_level == 2">
+			AND m_idx = #{m_idx}
 		</if>
 	</sql>
 </mapper>

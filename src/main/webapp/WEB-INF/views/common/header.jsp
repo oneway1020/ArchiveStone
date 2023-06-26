@@ -133,7 +133,7 @@
 						<a href="/accounts/myInfo/${user.m_id}">내정보</a>
 					</li>
 					<li>
-						<a href="/board/Q&A">Q&A</a>
+						<a href="/board/Q&A/record">Q&amp;A</a>
 					</li>
 					<c:if test="${user.m_level == 0}">
 						<li>

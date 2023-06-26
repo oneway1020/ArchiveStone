@@ -61,6 +61,8 @@
 		<mvc:interceptor>
 			<!-- <mapping path="/**"/> 모든 url에 적용하고 싶을 때 /**를 사용 -->
 			<mvc:mapping path="/accounts/myInfo/**"/>
+			<mvc:mapping path="/board/Q&amp;A"/>
+			<mvc:mapping path="/board/Q&amp;A/**"/>
 			<ref bean="LoginInterceptor"/>
 		</mvc:interceptor>
 	</mvc:interceptors>

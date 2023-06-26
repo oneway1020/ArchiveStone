@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.main.archive.board.dao.BoardDAO;
 import com.main.archive.board.dto.BoardDTO;
+import com.main.archive.board.dto.QnABoardDTO;
+import com.main.archive.comment.dto.QnACommentDTO;
 import com.main.archive.common.util.search.SearchCriteria;
 
 
@@ -69,12 +71,22 @@ public class BoardService {
 		
 		return result;
 	}
+	// 게시글 등록 (QnA)
+	public int qnaBoardRegister(BoardDTO boardDTO) {
+		return boardDAO.qnaBoardRegister(boardDTO);
+	}	
 	
 	//-----------------------------------------------------------------------------------------------------------
 	// 게시판 게시글 수
 	//-----------------------------------------------------------------------------------------------------------		
 	public int totalBoardRecordCount(SearchCriteria cri) {
 		return boardDAO.totalBoardRecordCount(cri);
+	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 게시판 게시글 수 (QnA)
+	//-----------------------------------------------------------------------------------------------------------		
+	public int totalQnABoardRecordCount(SearchCriteria cri) {
+		return boardDAO.totalQnABoardRecordCount(cri);
 	}
 
 	//-----------------------------------------------------------------------------------------------------------
@@ -92,6 +104,10 @@ public class BoardService {
 		result.setM_ip(twoIP);
 		
 		return result;
+	}
+	// QnA게시판용
+	public QnABoardDTO qnaboardRecordDetail(SearchCriteria cri) {
+		return boardDAO.qnaboardRecordDetail(cri);
 	}
 	
 	//-----------------------------------------------------------------------------------------------------------
@@ -168,6 +184,42 @@ public class BoardService {
 		
 		return result;
 	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// 게시판 이름 가져오기
+	//-----------------------------------------------------------------------------------------------------------
+	public String getBoardName(String bc_code) {
+		return boardDAO.getBoardName(bc_code);
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// Q&A 게시판 뷰
+	//-----------------------------------------------------------------------------------------------------------
+	public List<QnABoardDTO> getQnaRecord(SearchCriteria cri) {
+		return boardDAO.getQnaRecord(cri);
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// QnA 관리자 댓글 등록
+	//-----------------------------------------------------------------------------------------------------------
+	@Transactional(rollbackFor = {Exception.class})
+	public int adminCommentRegister(QnACommentDTO commentDTO) {
+		int result = boardDAO.adminCommentRegister(commentDTO);
+		// qna_board의 q_reply 개수 업데이트
+		boardDAO.updateAdminCommentCount(commentDTO);
+		return result;
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// QnA 관리자 댓글등록 결과 댓글 가져오기 (댓글 로딩)
+	//-----------------------------------------------------------------------------------------------------------
+	public List<QnACommentDTO> adminCommentLoad(QnACommentDTO commentDTO) {
+		return boardDAO.adminCommentLoad(commentDTO);
+	}
+
+
+
+
 
 }
 

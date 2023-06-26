@@ -30,6 +30,10 @@ function recordRegister(code) {
 function goRecordDetail(code, number) {
 	location.href="/board/view?bc_code=" + code + "&b_num=" + number + "&page=1";
 }
+// 게시글 클릭했을때 (QnA)
+function goQnARecordDetail(idx, number) {
+	location.href="/board/Q&A/view?q_num=" + number + "&m_idx=" + idx;
+}
 
 // 게시글 검색
 function searchRecord() {
@@ -51,4 +55,15 @@ function searchRecord() {
 	formObj.find("[name='page']").val("1");
 	
 	formObj.submit();
+}
+
+// QnA 페이지용
+// 전체글 버튼 눌렸을때
+$(".totalRecord").click(function(){
+	location.href ="/board/Q&A/record";
+});
+
+// 글쓰기 버튼
+function qnaRecordRegister() {
+	location.href="/board/Q&A/register";
 }

@@ -39,13 +39,15 @@ public class Criteria {
 	// 생성자에서 생성된 perPageNum 값이 아닌 다른 값으로 변경이 오면
 	// 생성자에서 생성된 값으로 유지시킨다.
 	public void setPerPageNum(int pageCount) {
-		int cnt = this.perPageNum;
+//		int cnt = this.perPageNum;
+//		
+//		if(pageCount != cnt) {
+//			this.perPageNum = cnt;
+//		} else {
+//			this.perPageNum = pageCount;
+//		}
 		
-		if(pageCount != cnt) {
-			this.perPageNum = cnt;
-		} else {
-			this.perPageNum = pageCount;
-		}
+		perPageNum = pageCount;
 	}
 
 	

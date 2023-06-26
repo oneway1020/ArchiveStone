@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.apache.ibatis.session.SqlSession;
 import com.main.archive.board.dto.BoardDTO;
+import com.main.archive.board.dto.QnABoardDTO;
+import com.main.archive.comment.dto.QnACommentDTO;
 import com.main.archive.common.util.search.SearchCriteria;
 
 @Repository
@@ -48,6 +50,10 @@ public class BoardDAO {
 		int result = sqlSession.insert(namespace + ".boardRegister", boardDTO);
 		return result;
 	}
+	// 게시글 등록 (QnA)
+	public int qnaBoardRegister(BoardDTO boardDTO) {
+		return sqlSession.insert(namespace + ".qnaBoardRegister", boardDTO);
+	}
 	
 	//-----------------------------------------------------------------------------------------------------------
 	// 게시판 게시글 수
@@ -55,6 +61,13 @@ public class BoardDAO {
 	public int totalBoardRecordCount(SearchCriteria cri) {
 
 		return sqlSession.selectOne(namespace + ".totalBoardRecordCount", cri);
+	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 게시판 게시글 수 (QnA)
+	//-----------------------------------------------------------------------------------------------------------
+	public int totalQnABoardRecordCount(SearchCriteria cri) {
+		
+		return sqlSession.selectOne(namespace + ".totalQnABoardRecordCount", cri);
 	}
 
 	//-----------------------------------------------------------------------------------------------------------
@@ -71,7 +84,10 @@ public class BoardDAO {
 	public BoardDTO boardRecordDetail(SearchCriteria cri) {
 		return sqlSession.selectOne(namespace + ".recordDetail", cri);
 	}
-	
+	// QnA 게시판용
+	public QnABoardDTO qnaboardRecordDetail(SearchCriteria cri) {
+		return sqlSession.selectOne(namespace + ".qnaboardRecordDetail", cri);
+	}	
 	
 	//-----------------------------------------------------------------------------------------------------------
 	// 게시글 수정
@@ -143,4 +159,44 @@ public class BoardDAO {
 	public void boardGoodBadInfoDelete() {
 		sqlSession.delete(namespace + ".boardGoodBadInfoDelete");
 	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// 게시판 이름 가져오기
+	//-----------------------------------------------------------------------------------------------------------
+	public String getBoardName(String bc_code) {
+		return sqlSession.selectOne(namespace + ".getBoardName", bc_code);
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// Q&A 게시판 뷰
+	//-----------------------------------------------------------------------------------------------------------
+	public List<QnABoardDTO> getQnaRecord(SearchCriteria cri) {
+		return sqlSession.selectList(namespace + ".getQnaRecord", cri);
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// QnA 관리자 댓글 등록
+	//-----------------------------------------------------------------------------------------------------------
+	public int adminCommentRegister(QnACommentDTO commentDTO) {
+		return sqlSession.insert(namespace + ".adminCommentRegister", commentDTO);
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// QnA 게시글 댓글 개수 업데이트
+	//-----------------------------------------------------------------------------------------------------------
+	public void updateAdminCommentCount(QnACommentDTO commentDTO) {
+		sqlSession.update(namespace + ".updateAdminCommentCount", commentDTO);
+	}
+
+	//-----------------------------------------------------------------------------------------------------------
+	// QnA 관리자 댓글등록 결과 댓글 가져오기
+	//-----------------------------------------------------------------------------------------------------------
+	public List<QnACommentDTO> adminCommentLoad(QnACommentDTO commentDTO) {
+		List<QnACommentDTO> result = sqlSession.selectList(namespace + ".adminCommentLoad", commentDTO);
+		return result;
+	}
+
+
+
+
 }

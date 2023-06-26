@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -24,7 +24,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.google.gson.JsonObject;
 import com.main.archive.board.dto.BoardDTO;
+import com.main.archive.board.dto.QnABoardDTO;
 import com.main.archive.board.service.BoardService;
+import com.main.archive.comment.dto.QnACommentDTO;
 import com.main.archive.common.util.ClientUtils;
 import com.main.archive.common.util.MediaUtils;
 import com.main.archive.common.util.search.PageMaker;
@@ -85,6 +87,9 @@ public class BoardController {
 		
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setCri(cri);
+		String	boardName = boardService.getBoardName(cri.getBc_code());
+
+		
 		// 페이지메이커에 총 레코드 개수 넣어준다.
 		pageMaker.setTotalCount(boardService.totalBoardRecordCount(cri));
 		List<BoardDTO> recordList = boardService.boardRecordList(cri);
@@ -92,7 +97,7 @@ public class BoardController {
 //		List<BoardDTO> recordList = boardService.boardRecordList(bc_code);
 //		System.out.println("recordList: " + recordList);
 		
-		model.addAttribute("title", cri.getBc_code());
+		model.addAttribute("title", boardName);
 		model.addAttribute("recordList", recordList);
 		model.addAttribute("pageMaker", pageMaker);
 		// System.out.println(pageMaker);
@@ -108,6 +113,8 @@ public class BoardController {
 		UserDTO user = (UserDTO)session.getAttribute("user");
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setCri(cri);
+		String	boardName = boardService.getBoardName(cri.getBc_code());
+		
 		// 페이지메이커에 총 레코드 개수 넣어준다.
 		pageMaker.setTotalCount(boardService.totalBoardRecordCount(cri));
 		// 전체 게시글 정보
@@ -115,7 +122,7 @@ public class BoardController {
 		// 누른 게시글 정보
 		BoardDTO recordOne = boardService.boardRecordDetail(cri);
 		
-		
+		model.addAttribute("title", boardName);
 		model.addAttribute("recordOne", recordOne);
 		model.addAttribute("recordList", recordList);
 		model.addAttribute("pageMaker", pageMaker);
@@ -132,6 +139,14 @@ public class BoardController {
 		model.addAttribute("bc_code", bc_code);
 		return "/board/boardRegister";
 	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 글쓰기 화면 불러오기 (QnA)
+	//-----------------------------------------------------------------------------------------------------------
+	@RequestMapping(value = "/Q&A/register")
+	public String qnaregisterForm(HttpSession session, Model model) {
+
+		return "/board/QnARegister";
+	}
 	
 	//-----------------------------------------------------------------------------------------------------------
 	// 게시글 등록-작성-업로드
@@ -144,6 +159,21 @@ public class BoardController {
 		boardDTO.setM_ip(ip);
 		// System.out.println("게시글 등록 boardDTO: " + boardDTO);
 		int result = boardService.boardRegister(boardDTO);
+		
+		return result;
+		
+	}
+	//-----------------------------------------------------------------------------------------------------------
+	// 게시글 등록-작성-업로드 (QnA)
+	//-----------------------------------------------------------------------------------------------------------	
+	@ResponseBody
+	@RequestMapping(value="/Q&A/boardRegister", method=RequestMethod.POST)
+	public int qnaBoardRegister(BoardDTO boardDTO, HttpServletRequest request, HttpSession session) throws Exception {
+		UserDTO user = (UserDTO)session.getAttribute("user");
+		String ip = ClientUtils.getRemoteIP(request);
+		boardDTO.setM_ip(ip);
+		boardDTO.setM_idx(user.getM_idx());
+		int result = boardService.qnaBoardRegister(boardDTO);
 		
 		return result;
 		
@@ -337,14 +367,91 @@ public class BoardController {
 		System.out.println("삭제 boardDTO b_num= " + boardDTO.getB_num() + "bc_code= " + boardDTO.getBc_code());
 		return boardService.boardRecordDelete(boardDTO);
 	}
+	//-----------------------------------------------------------------------------------------------------------
+	// Q&A 게시판 뷰
+	//-----------------------------------------------------------------------------------------------------------	
+	@RequestMapping(value="/Q&A/record", method=RequestMethod.GET)
+	public String QnARecord(SearchCriteria cri, HttpSession session, Model model) {
+		UserDTO user = (UserDTO)session.getAttribute("user");
+		// SearchCriteria에 id 지정
+		cri.setM_id(user.getM_id());
+		cri.setM_level(user.getM_level());
+		cri.setM_idx(user.getM_idx());
+		
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		
+		// 페이지메이커에 총 레코드 개수 넣어준다.
+		pageMaker.setTotalCount(boardService.totalBoardRecordCount(cri));	
+		
+		List<QnABoardDTO> qnaList = boardService.getQnaRecord(cri);
+		
+		model.addAttribute("recordList", qnaList);
+		model.addAttribute("pageMaker", pageMaker);
+		return "/board/QnARecord";
+	}
 	
+	//-----------------------------------------------------------------------------------------------------------
+	// Q&A 게시판 누른 게시글 정보 + 해당 게시판 게시글 목록 가져오기
+	//-----------------------------------------------------------------------------------------------------------
+	@RequestMapping(value = "/Q&A/view", method = RequestMethod.GET)
+	public String QnARecordView(SearchCriteria cri, Model model, HttpSession session) throws Exception {
+		
+		UserDTO user = (UserDTO)session.getAttribute("user");
+		// SearchCriteria에 id 지정
+		cri.setM_id(user.getM_id());
+		cri.setM_level(user.getM_level());
+		// user level이 0이 아니면 idx값은 해당 유저 idx값으로 0이면 파라미터값에 있는 idx값으로 게시글 내용을 불러온다.
+		if(user.getM_level() != 0) {
+			cri.setM_idx(user.getM_idx());			
+		}
+		
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		
+		// 페이지메이커에 총 레코드 개수 넣어준다.
+		pageMaker.setTotalCount(boardService.totalBoardRecordCount(cri));
+		// 전체 게시글 정보
+		List<QnABoardDTO> qnaList = boardService.getQnaRecord(cri);
+		// 누른 게시글 정보
+		QnABoardDTO recordOne = boardService.qnaboardRecordDetail(cri);
+		
+		model.addAttribute("recordOne", recordOne);
+		model.addAttribute("recordList", qnaList);
+		model.addAttribute("pageMaker", pageMaker);
+		
+		return "/board/QnAView";
+	}
 	
+	//-----------------------------------------------------------------------------------------------------------
+	// QnA 관리자 댓글 등록
+	//-----------------------------------------------------------------------------------------------------------
+	@ResponseBody
+	@RequestMapping(value="/Q&A/adminCommentRegister", method=RequestMethod.POST)
+	public int adminCommentRegister(QnACommentDTO commentDTO, HttpSession session) {
+		UserDTO user = (UserDTO)session.getAttribute("user");
+		// 유저레벨이 0이 아니면 return
+		if(user.getM_level() != 0) {
+			return 0;
+		}
+		commentDTO.setM_id(user.getM_id());
+		commentDTO.setM_name(user.getM_name());
+		return boardService.adminCommentRegister(commentDTO);
+	}
 	
-	
-	
-	
-	
-	
+	//-----------------------------------------------------------------------------------------------------------
+	// QnA 관리자 댓글등록 결과 댓글 가져오기 (댓글 로딩)
+	//-----------------------------------------------------------------------------------------------------------
+	@ResponseBody
+	@RequestMapping(value="/Q&A/adminCommentLoad", method=RequestMethod.GET)
+	public List<QnACommentDTO> adminCommentLoad(QnACommentDTO commentDTO) {
+		//HashMap<String, Object> map = new HashMap<>();
+		List<QnACommentDTO> result = boardService.adminCommentLoad(commentDTO);
+		//System.out.println("관리자댓글 가져오기 List DTO: " + result);
+		//map.put("list", result);
+		//System.out.println("관리자 댓글 map: " + map);
+		return result;
+	}
 	
 	
 	

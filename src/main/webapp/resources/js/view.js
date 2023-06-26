@@ -131,11 +131,11 @@ function commentRegister() {
     },
     success: function (data) {
       if (data == 1) {
-        alert("게시글 등록이 완료되었습니다.");
+        alert("댓글 등록이 완료되었습니다.");
         $("#commentContent").val("");
         commentLoad();
       } else {
-        alert("게시글 등록에 실패하였습니다.\n\n잠시후 다시 시도해주세요.");
+        alert("댓글 등록에 실패하였습니다.\n\n잠시후 다시 시도해주세요.");
       }
     },
     error: function (e) {
